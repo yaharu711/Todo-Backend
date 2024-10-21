@@ -22,7 +22,7 @@ RUN apt-get update && \
 COPY ./prod/php.ini /usr/local/etc/php/php.ini
 COPY ./prod/apache/httpd.conf /etc/apache2/sites-available/000-default.conf
 COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
-COPY ./src .
+COPY ./src/laravel-api-practice .
 COPY ./prod/scripts/laravel-deploy.sh ./scripts/start.sh
 
 #.htaccessで必要
@@ -31,7 +31,7 @@ RUN mv /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled && \
 
 RUN /bin/sh -c a2enmod rewrite
 
-RUN chown www-data storage/ -R
+RUN chown www-data ./storage/ -R
 
 RUN chmod +x ./scripts/start.sh
 CMD ["./scripts/start.sh"]
