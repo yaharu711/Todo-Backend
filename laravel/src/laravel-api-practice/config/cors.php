@@ -1,0 +1,14 @@
+<?php
+    return [
+        // CORSヘッダーを出力するパスのパターン、任意でワイルドカード(*)が利用できる。
+        //全てのルートを対象にする場合: ['*']
+       'paths' => ['api/*', 'login'],
+
+        // マッチするHTTPメソッド。 `[*]` だと全てのリクエストにマッチする。
+        //GETとPOSTだけを許可する場合: ['GET', 'POST']
+       'allowed_methods' => ['*'],
+        // 許可するリクエストオリジンの設定
+        //`*`かオリジンに完全一致、またはワイルドカードが利用可。
+       'allowed_origins' => ['http://localhost:5173'],
+       'supports_credentials' => true,
+    ];
