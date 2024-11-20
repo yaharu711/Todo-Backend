@@ -7,6 +7,7 @@
         // マッチするHTTPメソッド。 `[*]` だと全てのリクエストにマッチする。
         //GETとPOSTだけを許可する場合: ['GET', 'POST']
        'allowed_methods' => ['*'],
+       'allowed_headers' => ['*'],
         // 許可するリクエストオリジンの設定
         //`*`かオリジンに完全一致、またはワイルドカードが利用可。
        'allowed_origins' => ['http://localhost:5173'],
