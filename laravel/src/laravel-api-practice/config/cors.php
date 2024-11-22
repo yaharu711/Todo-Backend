@@ -10,6 +10,6 @@
        'allowed_headers' => ['*'],
         // 許可するリクエストオリジンの設定
         //`*`かオリジンに完全一致、またはワイルドカードが利用可。
-       'allowed_origins' => ['http://localhost:5173'],
+       'allowed_origins' => ['http://localhost:5173', "https://todo-react-typescript-beta.vercel.app"],
        'supports_credentials' => true,
     ];
