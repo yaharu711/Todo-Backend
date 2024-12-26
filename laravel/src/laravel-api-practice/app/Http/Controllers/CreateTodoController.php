@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateTodoRequest;
 use DateTimeImmutable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -12,7 +13,7 @@ class CreateTodoController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(CreateTodoRequest $request)
+    public function __invoke(CreateTodoRequest $request): JsonResponse
     {
         $now = new DateTimeImmutable();
         $todoName = $request->input('name');
