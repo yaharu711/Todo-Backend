@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/hello-message', GetHelloMessageController::class);
-    Route::post('/todo', CreateTodoController::class);
-    Route::get('/todo', GetTodosController::class);
-    Route::patch('/todo/{id}', UpdateTodoController::class);
-    Route::delete('/todo/{id}', DeleteTodoController::class);
+    Route::post('/todos', CreateTodoController::class);
+    Route::get('/todos', GetTodosController::class);
+    Route::patch('/todos/{id}', UpdateTodoController::class);
+    Route::delete('/todos/{id}', DeleteTodoController::class);
 });

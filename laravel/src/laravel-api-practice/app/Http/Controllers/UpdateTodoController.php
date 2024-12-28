@@ -22,6 +22,7 @@ class UpdateTodoController extends Controller
         DB::beginTransaction();
         try {
             $todo = DB::select('select * from todos where id = :id', [$id]);
+            if (count($todo) === 0) return response()->json(['message' => "指定されたtodo（id: {$id}）は存在していません。"], 404);
 
             $updated_todo_arr = [];
             $should_update_name = !is_null($input_name) && $input_name !== $todo[0]->name;
