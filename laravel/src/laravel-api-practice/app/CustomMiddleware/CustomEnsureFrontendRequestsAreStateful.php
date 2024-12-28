@@ -4,7 +4,7 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 /**
  * なぜか、Postmanからだとweb.phpで ->withoutMiddleware(ValidateCsrfToken::class);としているのでCSRFトークン検証されず419は返されないが、
- * フロントエンドからのリクエストだと、それだけじゃ足りず以下のCSRFトークン検証をコメントアウト外さないといけない。いやーー謎だね！このクラスの呼び出され方なんだろうけど。
+ * フロントエンドからのリクエストだと、それだけじゃ足りず以下のCSRFトークン検証をコメントアウト
  * なので、frontendMiddlewareをオーバーライドするためのカスタムクラス
  */
 class CustomEnsureFrontendRequestsAreStateful extends EnsureFrontendRequestsAreStateful
