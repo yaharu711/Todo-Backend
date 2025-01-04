@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CheckLoginedController;
 use App\Http\Controllers\CreateTodoController;
 use App\Http\Controllers\DeleteTodoController;
 use App\Http\Controllers\GetHelloMessageController;
@@ -14,3 +15,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::patch('/todos/{id}', UpdateTodoController::class);
     Route::delete('/todos/{id}', DeleteTodoController::class);
 });
+
+Route::post('/check-login', CheckLoginedController::class);
