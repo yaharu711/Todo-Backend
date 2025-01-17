@@ -12,15 +12,12 @@ class GetTodosController extends Controller
      */
     public function __invoke(): JsonResponse
     {
-        $todoArray = DB::select('SELECT * FROM todos ORDER BY id DESC');
+        $imcompletedTodos = DB::select('SELECT * FROM todos where is_completed = false ORDER BY imcompleted_at DESC');
+        $completedTodos = DB::select('SELECT * FROM todos where is_completed = true ORDER BY completed_at DESC');
 
         return response()->json([
-            'imcompletedTodos' => array_values(array_filter($todoArray, function($todo) {
-               return !$todo->is_completed;
-            })),
-            'completedTodos' => array_values(array_filter($todoArray, function($todo) {
-               return $todo->is_completed;
-            })),
+            'imcompletedTodos' => $imcompletedTodos,
+            'completedTodos' => $completedTodos,
         ]);
     }
 }
