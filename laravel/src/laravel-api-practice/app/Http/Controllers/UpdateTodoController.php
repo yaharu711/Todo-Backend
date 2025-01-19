@@ -34,9 +34,9 @@ class UpdateTodoController extends Controller
             if ($should_update_is_completed) {
                 $updated_todo_arr['is_completed'] = $input_is_completed;
                 if ($input_is_completed) {
-                    $updated_todo_arr['completed_at'] = $now->format('Y-m-d H:m:s');
+                    $updated_todo_arr['completed_at'] = $now->format('Y-m-d H:i:s');
                 } else {
-                    $updated_todo_arr['imcompleted_at'] = $now->format('Y-m-d H:m:s');
+                    $updated_todo_arr['imcompleted_at'] = $now->format('Y-m-d H:i:s');
                 }
             }
 

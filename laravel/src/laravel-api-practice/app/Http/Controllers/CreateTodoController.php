@@ -20,8 +20,8 @@ class CreateTodoController extends Controller
         $todoName = $request->input('name');
         DB::table('todos')->insert([
             'name' => $todoName,
-            'created_at' => $now->format('Y-m-d h:m:s'),
-            'imcompleted_at' => $now->format('Y-m-d h:m:s'),
+            'created_at' => $now->format('Y-m-d H:i:s'),
+            'imcompleted_at' => $now->format('Y-m-d H:i:s'),
             'user_id' => $user_id,
         ]);
 
