@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CheckHealthController;
 use App\Http\Controllers\CheckLoginedController;
 use App\Http\Controllers\CreateTodoController;
 use App\Http\Controllers\DeleteTodoController;
@@ -16,4 +17,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/todos/{id}', DeleteTodoController::class);
 });
 
+Route::get('/health-check', CheckHealthController::class);
 Route::post('/check-login', CheckLoginedController::class);
