@@ -32,4 +32,18 @@ class CustomEnsureFrontendRequestsAreStateful extends EnsureFrontendRequestsAreS
 
         return $middleware;
     }
+
+    /**
+     * Configure secure cookie sessions.
+     *
+     * @return void
+     */
+    protected function configureSecureCookieSessions()
+    {
+        config([
+            'session.lifetime' => 10080,
+            'session.http_only' => true,
+            'session.same_site' => 'lax',
+        ]);
+    }
 }

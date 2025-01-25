@@ -12,7 +12,6 @@ class CheckLoginedController extends Controller
      */
     public function __invoke(): JsonResponse
     {
-        if (is_null(Auth::user())) $is_logined = false;
         $is_logined = !is_null(Auth::user());
 
         return response()->json(['is_logined' => $is_logined], 200);
