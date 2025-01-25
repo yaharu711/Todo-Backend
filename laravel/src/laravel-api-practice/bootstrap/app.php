@@ -13,6 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(CustomEnsureFrontendRequestsAreStateful::class);
+        // 以下をONにすると、Auth系で認証を扱う時に、トークン認証も必須となってしまうので注意
+        // $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
