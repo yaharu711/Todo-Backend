@@ -2,7 +2,7 @@
     return [
         // CORSヘッダーを出力するパスのパターン、任意でワイルドカード(*)が利用できる。
         //全てのルートを対象にする場合: ['*']
-       'paths' => ['api/*', 'login', 'logout', 'check-login'],
+       'paths' => ['api/*', 'regist', 'login', 'logout', 'check-login'],
 
         // マッチするHTTPメソッド。 `[*]` だと全てのリクエストにマッチする。
         //GETとPOSTだけを許可する場合: ['GET', 'POST']
