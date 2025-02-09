@@ -24,6 +24,7 @@ class CreateTodoController extends Controller
             // Todoの作成
             $created_todo_id = DB::table('todos')->insertGetId([
                 'name' => $todoName,
+                'memo' => '',
                 'created_at' => $now->format('Y-m-d H:i:s'),
                 'imcompleted_at' => $now->format('Y-m-d H:i:s'),
                 'user_id' => $user_id,

@@ -13,6 +13,7 @@ class UpdateTodoRequest extends FormRequest
     {
         return [
             'name' => ['string', 'min:1', 'max:100'],
+            'memo' => ['string', 'max:3000'],
             'is_completed' => ['boolean'],
         ];
     }
@@ -23,8 +24,8 @@ class UpdateTodoRequest extends FormRequest
             // リクエスト全体にカスタムバリデーションを適用
             $data = $this->all();
 
-            if (!isset($data['name']) && !isset($data['is_completed'])) {
-                $validator->errors()->add('request_body', "リクエストボディには少なくとも 'name' または 'is_completed' のいずれかが必要です。");
+            if (!isset($data['name']) && !isset($data['is_completed']) && !isset($data['memo'])) {
+                $validator->errors()->add('request_body', "リクエストボディには少なくとも 'name' または 'is_completed'、'memo' のいずれかが必要です。");
             }
         });
     }
