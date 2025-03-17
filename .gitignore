@@ -1,4 +1,5 @@
 .env
 ./laravel/laravel_error.log
+laravel/local/secrets/
 .env.local
 .env.production
