@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+chmod -R 755 /etc/secrets/
+
 set -ex
 echo "Running composer"
 composer install --no-dev --working-dir=/var/www
