@@ -24,3 +24,9 @@ RUN mkdir /usr/local/etc/php/log && \
 RUN mv /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled && \
     mv /etc/apache2/mods-available/headers.load /etc/apache2/mods-enabled/
 RUN /bin/sh -c a2enmod rewrite
+
+# service accountのファイルをコンテナ内に保存する
+# Render.comもetc/secrets/<filename>になるので、ローカルでも揃える
+COPY ./secrets /etc/secrets/
+# 実行権限もないとディレクトリにアクセスできないため所有者以外にも5を付与している
+RUN chmod 755 /etc/secrets/
