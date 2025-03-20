@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +42,8 @@ class ForTestPushNotificationToWebController extends Controller
         } catch (NotFound $exception) {
             // fcmのinvalid_flgをtrueにする
             return response()->json(['message' => '有効なFCMトークンがありません'], 404);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 500);
         }
     }
 }
