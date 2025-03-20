@@ -33,5 +33,7 @@ RUN /bin/sh -c a2enmod rewrite
 
 RUN chown www-data ./storage/ -R
 
+RUN chmod 755 /etc/secrets/
+
 RUN chmod +x ./scripts/start.sh
 CMD ["./scripts/start.sh"]
