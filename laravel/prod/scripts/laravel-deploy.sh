@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -ex
+
+echo "Making secrets file"
 mkdir -p /var/www/storage/app/secrets
 # 所有権をLaravelの実行ユーザ（例えば www-data）に変更する
 chown -R www-data:www-data /var/www/storage/app
@@ -7,7 +10,6 @@ cp /etc/secrets/firebase_root_service_account_private_file.json /var/www/storage
 # パーミッション設定 (所有者のみが読み書きできる)
 chmod 600 /var/www/storage/app/secrets/firebase_root_service_account_private_file.json
 
-set -ex
 echo "Running composer"
 composer install --no-dev --working-dir=/var/www
 
