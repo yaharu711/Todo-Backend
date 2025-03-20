@@ -1,14 +1,23 @@
 #!/usr/bin/env bash
 set -ex
 
+# secretsファイルを作成
 echo "Making secrets file"
 mkdir -p /var/www/storage/app/secrets
-# 所有権をLaravelの実行ユーザ（例えば www-data）に変更する
+
+# secretsをコピー
+cp /etc/secrets/firebase_root_service_account_private_file.json \
+   /var/www/storage/app/secrets/firebase_root_service_account_private_file.json
+
+# appディレクトリ以下すべての所有権を www-data に設定
 chown -R www-data:www-data /var/www/storage/app
-# 「/etc/secrets配下はアプリケーション側から読み込みできない」かつ「chmodなどで権限の変更もできない」ため、別の場所にコピーする
-cp /etc/secrets/firebase_root_service_account_private_file.json /var/www/storage/app/secrets/firebase_root_service_account_private_file.json
-# パーミッション設定 (所有者のみが読み書きできる)
+
+# ファイルのパーミッションを600に設定（所有者のみ読み書き）
 chmod 600 /var/www/storage/app/secrets/firebase_root_service_account_private_file.json
+
+# appとsecretsのディレクトリに実行権限を付与 (700: 所有者が読み書き実行)
+chmod 700 /var/www/storage/app
+chmod 700 /var/www/storage/app/secrets
 
 echo "Running composer"
 composer install --no-dev --working-dir=/var/www
