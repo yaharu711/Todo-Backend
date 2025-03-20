@@ -18,6 +18,7 @@ class ForTestPushNotificationToWebController extends Controller
     {
         $user_id = Auth::id();
         $fcm = DB::select('select * from fcm where user_id = ? order by created_at desc limit 1', [$user_id])[0];
+        if (count($fcm) === 0) return response()->json(['message' => '有効なFCMトークンがありません。通知設定でONにしてから再度実行してください'], 400);
 
         $messaging = (new Factory)
             ->withServiceAccount(env('FIREBASE_SERVICE_ACCOUNT_PRIVATE_FILE_PATH'))
@@ -32,7 +33,7 @@ class ForTestPushNotificationToWebController extends Controller
                 'notification' => [
                     'title' => 'Laravel APIからweb push 成功!!',
                     'body' => 'よーし！ChatGPTどんどん使いこなしていく',
-                    // 'requireInteraction' => 'true',
+                    'requireInteraction' => 'true',
                 ],
             ],
         ];
