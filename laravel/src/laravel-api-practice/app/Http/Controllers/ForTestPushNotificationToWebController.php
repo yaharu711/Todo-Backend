@@ -17,6 +17,7 @@ class ForTestPushNotificationToWebController extends Controller
     {
         $user_id = Auth::id();
         $fcm = DB::select('select * from fcm where user_id = ? order by created_at desc limit 1', [$user_id])[0];
+
         $messaging = (new Factory)
             ->withServiceAccount(env('FIREBASE_SERVICE_ACCOUNT_PRIVATE_FILE_PATH'))
             ->createMessaging();
