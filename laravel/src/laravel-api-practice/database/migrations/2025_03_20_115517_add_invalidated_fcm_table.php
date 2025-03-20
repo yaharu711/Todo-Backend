@@ -11,8 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('fcm', function (Blueprint $table) {
+        Schema::create('invalidated_fcm', function (Blueprint $table) {
+            // user_idカラムを追加
+            $table->unsignedBigInteger('user_id');
+            $table->text('token');
+            $table->timestamp('created_at')->now();
+            
             $table->primary(['user_id', 'token']);
+            $table->foreign('user_id')->references('id')->on('users')->OnDelete('cascade');
         });
     }
 
@@ -21,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('fcm', function (Blueprint $table) {
+        Schema::table('invalidated_fcm', function (Blueprint $table) {
             //
         });
     }
