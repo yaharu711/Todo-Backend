@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PushNotificationTriggerController extends Controller
@@ -9,8 +10,8 @@ class PushNotificationTriggerController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
-        dd('PushNotificationTriggerController debug');        
+        return response()->json(['message' => 'PushNotificationTriggerController debug']);        
     }
 }
