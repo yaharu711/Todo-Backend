@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('success_todo_notification_schedules', function (Blueprint $table) {
             // 各Todoにつき一件のみの通知スケジュールを設定できるようにするため、todo_idを主キーに設定
-            $table->unsignedBigInteger('todo_id')->primary();
+            // と思ったが、一つのTodoで何回か通知を設定して受信することはあり得るので、主キーにはしない
+            $table->id();
+            $table->unsignedBigInteger('todo_id');
             // まだ小規模なアプリケーションのため、indexは設定しない
             $table->timestamp('notificate_at');
             $table->timestamp('created_at');
