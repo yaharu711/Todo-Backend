@@ -7,6 +7,7 @@ use App\Http\Controllers\DeleteTodoController;
 use App\Http\Controllers\GetTodosController;
 use App\Http\Controllers\ForTestPushNotificationToWebController;
 use App\Http\Controllers\InvalidateLatestFcmTokenController;
+use App\Http\Controllers\PushNotificationTriggerController;
 use App\Http\Controllers\SaveFcmTokenController;
 use App\Http\Controllers\SortTodosController;
 use App\Http\Controllers\UpdateTodoController;
@@ -21,7 +22,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/fcm', SaveFcmTokenController::class);
     Route::post('fcm/invalidate', InvalidateLatestFcmTokenController::class); // fcmトークンは一応残しておきたいから論理削除みたいにしている。
     Route::get('/fcm/check-exist-valid-token', CheckExistValidFcmToken::class);
-    Route::post('/push', ForTestPushNotificationToWebController::class);
 });
 
+Route::post('/notification/push-test', ForTestPushNotificationToWebController::class);
+Route::post('/notification/push', PushNotificationTriggerController::class);
 Route::get('/health-check', CheckHealthController::class);
