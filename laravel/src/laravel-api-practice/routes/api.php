@@ -24,6 +24,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/fcm/check-exist-valid-token', CheckExistValidFcmToken::class);
 });
 
+# この通知APIは知らない人に叩かれたところでAPIを叩く人起点で何か変わることはなく、アプリケーションのロジックで通知が実行されるかされないか決まるだけなので、認証は不要
+# rate limitは入れた方が良いかもしれないが、今回は省略
 Route::post('/notification/push-test', ForTestPushNotificationToWebController::class);
 Route::post('/notification/push', PushNotificationTriggerController::class);
 Route::get('/health-check', CheckHealthController::class);
