@@ -1,9 +1,9 @@
 <?php
-namespace App\Clients\KreaitFirebase;
+namespace App\PushNotification\Clients\KreaitFirebase;
 
-use App\Dto\FcmPushNotificationErrorDto;
-use App\Dto\FcmPushNotificationRequestDto;
-use App\Dto\FcmPushNotificationSuccessDto;
+use App\PushNotification\Dto\FcmPushNotificationErrorDto;
+use App\PushNotification\Dto\FcmPushNotificationRequestDto;
+use App\PushNotification\Dto\FcmPushNotificationSuccessDto;
 use DateTimeImmutable;
 use Kreait\Firebase\Messaging\MulticastSendReport;
 
@@ -88,7 +88,7 @@ class FcmSendAllReport
      * @param DateTimeImmutable $now
      * @return FcmPushNotificationErrorDto[]
      */
-    public function toFailedNotificationDtoList(
+    public function toErrorNotificationDtoList(
         array $notification_request_list,
          DateTimeImmutable $now
     ): array {

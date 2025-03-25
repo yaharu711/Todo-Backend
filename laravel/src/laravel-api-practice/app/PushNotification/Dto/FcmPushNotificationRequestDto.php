@@ -1,5 +1,5 @@
 <?php 
-namespace App\Dto;
+namespace App\PushNotification\Dto;
 
 class FcmPushNotificationRequestDto
 {
