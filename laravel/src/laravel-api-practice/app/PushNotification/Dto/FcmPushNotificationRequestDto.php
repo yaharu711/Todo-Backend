@@ -1,6 +1,8 @@
 <?php 
 namespace App\PushNotification\Dto;
 
+use DateTimeImmutable;
+
 class FcmPushNotificationRequestDto
 {
     public function __construct(
@@ -8,6 +10,6 @@ class FcmPushNotificationRequestDto
         readonly public int $todo_id,
         readonly public string $todo_name,
         readonly public string $token,
-        readonly public string $notificate_at
+        readonly public DateTimeImmutable $notificated_at
     ) {}
 }

@@ -2,12 +2,22 @@
 namespace App\PushNotification\Handlers;
 
 use App\PushNotification\Dto\FcmPushNotificationResultDto;
+use App\PushNotification\Dto\FcmPushNotificationSuccessDto;
+use App\PushNotification\Dto\FcmPushNotificationErrorDto;
 use App\PushNotification\Dto\NotificationResultDto;
+use App\PushNotification\Model\SuccessTodoNotificationScheduleModel;
+use App\PushNotification\Repositories\TodoNotificationScheduleRepository;
+use DateTimeImmutable;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
 class FcmNotificationResultHandler implements NotificationResultHandlerInterface
 {
+    public function __construct(
+        readonly private DateTimeImmutable $now,
+        private TodoNotificationScheduleRepository $todo_notification_schedule_repository
+    ){}
+
     /**
      * @param FcmPushNotificationResultDto $dto
      */
@@ -29,20 +39,20 @@ class FcmNotificationResultHandler implements NotificationResultHandlerInterface
         DB::beginTransaction();
         try {
             $todo_ids = array_map(fn($success_notification_dto) => $success_notification_dto->todo_id, $success_notification_dto_list);
-            DB::table('todo_notification_schedules')
-                ->whereIn('todo_id', $todo_ids)
-                ->delete();
+            $this->todo_notification_schedule_repository->deleteScheduleByTodoIds($todo_ids);
                 
             // どの通知手段だったかを記録するカラムも追加する。今回で言うと、fcmが入る
-            $insert_data = array_map(function ($success_notification_dto) {
-                return [
-                    'todo_id'       => $success_notification_dto->todo_id,
-                    'notificate_at' => $success_notification_dto->notificate_at,
-                    'created_at'    => $success_notification_dto->now,
-                ];
+            $success_notification_model_list = array_map(function ($success_notification_dto) {
+                return new SuccessTodoNotificationScheduleModel(
+                    0,
+                    $success_notification_dto->user_id,
+                    $success_notification_dto->todo_id,
+                    $success_notification_dto->notificated_at,
+                    $this->now,
+                    'FCM',
+                );
             }, $success_notification_dto_list);
-            // バッチインサートで一括挿入
-            DB::table('success_todo_notification_schedules')->insert($insert_data);
+            $this->todo_notification_schedule_repository->insertSuccessNotificationSchedule($success_notification_model_list);
             DB::commit();
         } catch (Exception $exception) {
             DB::rollBack();
@@ -85,7 +95,7 @@ class FcmNotificationResultHandler implements NotificationResultHandlerInterface
                 values (?, ?, ?, ?)',
                 [
                     $failed_notification_dto->todo_id,
-                    $failed_notification_dto->notificate_at,
+                    $failed_notification_dto->notificated_at,
                     $failed_notification_dto->error_message,
                     $failed_notification_dto->now,
                 ]

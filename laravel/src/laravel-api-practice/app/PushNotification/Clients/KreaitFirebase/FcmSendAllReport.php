@@ -51,12 +51,10 @@ class FcmSendAllReport
     /**
      * Dtoに変換することで、ビジネスロジックの中でライブラリの知識を持たないようにする
      * @param FcmPushNotificationRequestDto[] $notification_request_list
-     * @param DateTimeImmutable $now
      * @return FcmPushNotificationSuccessDto[]
      */
     public function toSuccessNotificationDtoList(
         array $notification_request_list,
-         DateTimeImmutable $now
     ): array {
         $notificationsByToken = [];
         foreach ($notification_request_list as $notification) {
@@ -74,8 +72,7 @@ class FcmSendAllReport
                     $notificationsByToken[$token]->user_id,
                     $notificationsByToken[$token]->todo_id,
                     $notificationsByToken[$token]->token,
-                    $now,
-                    new DateTimeImmutable($notificationsByToken[$token]->notificate_at)
+                    $notificationsByToken[$token]->notificated_at
                 );
             }
         }
@@ -109,7 +106,7 @@ class FcmSendAllReport
                     $notificationsByToken[$token]->todo_id,
                     $notificationsByToken[$token]->token,
                     $now,
-                    new DateTimeImmutable($notificationsByToken[$token]->notificate_at),
+                    $notificationsByToken[$token]->notificated_at,
                     $error_message,
                     $invalidated_argument
                 );
