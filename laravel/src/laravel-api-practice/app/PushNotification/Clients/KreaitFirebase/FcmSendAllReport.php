@@ -4,7 +4,6 @@ namespace App\PushNotification\Clients\KreaitFirebase;
 use App\PushNotification\Dto\FcmPushNotificationErrorDto;
 use App\PushNotification\Dto\FcmPushNotificationRequestDto;
 use App\PushNotification\Dto\FcmPushNotificationSuccessDto;
-use DateTimeImmutable;
 use Kreait\Firebase\Messaging\MulticastSendReport;
 
 /**
@@ -82,12 +81,10 @@ class FcmSendAllReport
     /**
      * Dtoに変換することで、ビジネスロジックの中でライブラリの知識を持たないようにする
      * @param FcmPushNotificationRequestDto[] $notification_request_list
-     * @param DateTimeImmutable $now
      * @return FcmPushNotificationErrorDto[]
      */
     public function toErrorNotificationDtoList(
         array $notification_request_list,
-         DateTimeImmutable $now
     ): array {
         $notificationsByToken = [];
         foreach ($notification_request_list as $notification) {
@@ -105,7 +102,6 @@ class FcmSendAllReport
                     $notificationsByToken[$token]->user_id,
                     $notificationsByToken[$token]->todo_id,
                     $notificationsByToken[$token]->token,
-                    $now,
                     $notificationsByToken[$token]->notificated_at,
                     $error_message,
                     $invalidated_argument

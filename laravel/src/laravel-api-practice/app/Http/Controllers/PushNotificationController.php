@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\PushNotification\Clients\KreaitFirebase\KreaitFirebaseClient;
 use App\PushNotification\Handlers\FcmNotificationResultHandler;
 use App\PushNotification\QueryServices\FcmNotificationQueryService;
+use App\PushNotification\Repositories\FcmTokenRepository;
 use App\PushNotification\Repositories\TodoNotificationScheduleRepository;
 use App\PushNotification\Services\PushNotificationByFcmService;
 use Illuminate\Http\JsonResponse;
@@ -22,7 +23,8 @@ class PushNotificationController extends Controller
         $query_service = new FcmNotificationQueryService($now);
         $messaging = new PushNotificationByFcmService($now, $messaging, $query_service);
         $todo_notification_schedule_repository = new TodoNotificationScheduleRepository($now);
-        $handler = new FcmNotificationResultHandler($now, $todo_notification_schedule_repository);
+        $fcm_token_repository = new FcmTokenRepository($now);
+        $handler = new FcmNotificationResultHandler($now, $todo_notification_schedule_repository, $fcm_token_repository);
 
         $result = $messaging->run();
         // 通知の結果をハンドリングする

@@ -4,6 +4,7 @@ namespace App\PushNotification\Repositories;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 use App\PushNotification\Models\SuccessTodoNotificationScheduleModel;
+use App\PushNotification\Dto\FcmPushNotificationErrorDto;
 
 class TodoNotificationScheduleRepository
 {
@@ -30,5 +31,21 @@ class TodoNotificationScheduleRepository
             ];
         }, $success_notification_model_list);
         DB::table('success_todo_notification_schedules')->insert($insert_data);
+    }
+
+    /**
+     * @param FcmPushNotificationErrorDto[] $error_notification_model_list
+     */
+    public function insertErrorNotificationSchedule(array $error_notification_model_list): void
+    {
+        $insert_data = array_map(function ($error_notification_model) {
+            return [
+                'todo_id'       => $error_notification_model->todo_id,
+                'notificate_at' => $error_notification_model->notificated_at,
+                'failed_reason' => $error_notification_model->error_message,
+                'created_at'    => $this->now,
+            ];
+        }, $error_notification_model_list);
+        DB::table('failed_todo_notification_schedules')->insert($insert_data);
     }
 }

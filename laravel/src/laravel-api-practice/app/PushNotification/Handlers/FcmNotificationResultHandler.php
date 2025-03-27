@@ -6,6 +6,7 @@ use App\PushNotification\Dto\FcmPushNotificationSuccessDto;
 use App\PushNotification\Dto\FcmPushNotificationErrorDto;
 use App\PushNotification\Dto\NotificationResultDto;
 use App\PushNotification\Model\SuccessTodoNotificationScheduleModel;
+use App\PushNotification\Repositories\FcmTokenRepository;
 use App\PushNotification\Repositories\TodoNotificationScheduleRepository;
 use DateTimeImmutable;
 use Exception;
@@ -15,10 +16,12 @@ class FcmNotificationResultHandler implements NotificationResultHandlerInterface
 {
     public function __construct(
         readonly private DateTimeImmutable $now,
-        private TodoNotificationScheduleRepository $todo_notification_schedule_repository
+        readonly private TodoNotificationScheduleRepository $todo_notification_schedule_repository,
+        readonly private FcmTokenRepository $fcm_token_repository
     ){}
 
     /**
+     * TODO: 他の通知処理でも使えるように、SuccessTodoNotificationScheduleModelを受け取るように
      * @param FcmPushNotificationResultDto $dto
      */
     public function handle(NotificationResultDto $dto): void
@@ -30,6 +33,7 @@ class FcmNotificationResultHandler implements NotificationResultHandlerInterface
     /**
      * 成功した通知に対するスケジュール処理を行う
      *
+     * TODO: 他の通知処理でも使えるように、SuccessTodoNotificationScheduleModelを受け取るように
      * @param FcmPushNotificationSuccessDto[] $success_notification_dto_list
      *
      * @throws \Exception
@@ -67,39 +71,31 @@ class FcmNotificationResultHandler implements NotificationResultHandlerInterface
      */
     private function handleErrors(array $failed_notification_dto_list): void
     {
+        $invalided_notification_dto_list = [];
+        $other_error_notification_dto_list = [];
         foreach ($failed_notification_dto_list as $failed_notification_dto) {
-            if ($failed_notification_dto->invalided_argument) 
-            {
-                DB::beginTransaction();
-                try {
-                    DB::statement(
-                        'delete from fcm where user_id = ? and token = ?',
-                        [$failed_notification_dto->user_id, $failed_notification_dto->token]
-                    );
-                    // 同じトークンが複数回失敗している場合に備えinvalidated_fcmテーブルにupsert
-                    DB::statement(
-                        'insert into invalidated_fcm(user_id, token, created_at) values (?, ?, ?)
-                        on conflict(user_id, token) do nothing',
-                        [$failed_notification_dto->user_id, $failed_notification_dto->token, $failed_notification_dto->now]
-                    );
-                    DB::commit();
-                    continue;
-                } catch (Exception $exception) {
-                    DB::rollBack();
-                    continue;
-                }
+            if ($failed_notification_dto->invalided_argument) {
+                $invalided_notification_dto_list[] = $failed_notification_dto;
+            } else {
+                $other_error_notification_dto_list[] = $failed_notification_dto;
             }
-            // その他のエラーの場合、failed_todo_notification_schedulesテーブルにinsert
-            DB::statement(
-                'insert into failed_todo_notification_schedules(todo_id, notificate_at, failed_reason, created_at)
-                values (?, ?, ?, ?)',
-                [
-                    $failed_notification_dto->todo_id,
-                    $failed_notification_dto->notificated_at,
-                    $failed_notification_dto->error_message,
-                    $failed_notification_dto->now,
-                ]
-            );
+        }
+        
+        if (count($invalided_notification_dto_list) > 0) {
+            DB::beginTransaction();
+            try {
+                $this->fcm_token_repository->deleteFcmToken($invalided_notification_dto_list);
+                // 同じトークンが複数回失敗している場合に備えinvalidated_fcmテーブルにupsert
+                $this->fcm_token_repository->insertInvalidatedFcmToken($invalided_notification_dto_list);
+                DB::commit();
+            } catch (Exception $exception) {
+                DB::rollBack();
+            }
+        }
+        
+        if (count($other_error_notification_dto_list) > 0) {
+            // その他のエラーの場合、エラー通知スケジュールを登録する
+            $this->todo_notification_schedule_repository->insertErrorNotificationSchedule([$failed_notification_dto]);
         }
     }
 }
