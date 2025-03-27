@@ -17,6 +17,6 @@ class PushNotificationContent
 
     public static function getLink(int $todo_id): string
     {
-        return env('FRONTEND_APP_URL') . '/todos#' . $todo_id;
+        return env('FRONTEND_APP_URL') . '/todos#todo_id=' . $todo_id;
     }
 }

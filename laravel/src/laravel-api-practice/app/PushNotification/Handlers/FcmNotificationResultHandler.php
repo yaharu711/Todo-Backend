@@ -60,7 +60,7 @@ class FcmNotificationResultHandler implements NotificationResultHandlerInterface
         }
     }
 
-        /**
+    /**
      * 失敗したレスポンス（FailedMessage）の配列、通知情報、基準時刻を受け取り、エラーハンドリングを実施する
      *
      * @param FcmPushNotificationErrorDto[] $failed_notification_dto_list

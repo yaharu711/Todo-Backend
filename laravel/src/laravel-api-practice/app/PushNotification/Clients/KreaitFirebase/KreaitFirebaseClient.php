@@ -30,6 +30,7 @@ class KreaitFirebaseClient
     public function sendAll(array $notification_request_list): FcmSendAllReport
     {
         foreach ($notification_request_list as $notification_request) {
+            // TODO: 通知の設定内容を汎用化したが、これは通知の手段によって意外に変わるので、意味ないので、PushNotificationContentクラスをやめてこのクラスに凝集する
             $message[] = [
                 'token' => $notification_request->token,
                 'webpush' => [
