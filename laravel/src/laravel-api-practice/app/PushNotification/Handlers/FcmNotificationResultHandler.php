@@ -94,7 +94,7 @@ class FcmNotificationResultHandler implements NotificationResultHandlerInterface
         }
         
         if (count($other_error_notification_dto_list) > 0) {
-            // その他のエラーの場合、エラー通知スケジュールを登録する
+            // その他のエラーの場合、どのようなエラーが起きているのか分析するために、エラー通知スケジュールを登録する
             $this->todo_notification_schedule_repository->insertErrorNotificationSchedule([$failed_notification_dto]);
         }
     }

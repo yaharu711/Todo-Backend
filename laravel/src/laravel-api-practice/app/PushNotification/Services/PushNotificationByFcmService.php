@@ -29,7 +29,6 @@ class PushNotificationByFcmService
 
             $result = $this->messaging->sendAll($notification_request_list);
 
-            // 成功した通知について抽出する
             $success_notification_dto_list = $result->toSuccessNotificationDtoList($notification_request_list, $this->now);
             $error_notification_dto_list = $result->toErrorNotificationDtoList($notification_request_list, $this->now);
 
