@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateTodoRequest;
+use App\Repositories\TodoRepository;
 use DateTimeImmutable;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +17,7 @@ class UpdateTodoController extends Controller
      */
     public function __invoke(UpdateTodoRequest $request, int $todo_id): JsonResponse
     {
+        $todo_repository = new TodoRepository(new DateTimeImmutable());
         $user_id = Auth::id();
         $now = new DateTimeImmutable();
         $input_name = $request->input('name');
@@ -25,36 +27,33 @@ class UpdateTodoController extends Controller
 
         DB::beginTransaction();
         try {
-            $todo = DB::select('select * from todos where id = :id', [$todo_id]);
-            if (count($todo) === 0) return response()->json(['message' => "指定されたtodo（id: {$todo_id}）は存在していません。"], 404);
+            $todo = $todo_repository->getTodo($user_id, $todo_id);
+            if (is_null($todo)) return response()->json(['message' => '指定されたtodoは存在しません'], 404);
 
-            $updated_todo_arr = [];
-            $should_update_name = !is_null($input_name) && $input_name !== $todo[0]->name;
-            $should_update_memo = !is_null($input_memo) && $input_memo !== $todo[0]->memo;
-            $should_update_notificate_at = !is_null($input_notificate_at) && $input_notificate_at !== $todo[0]->notificate_at;
-            $should_update_is_completed = !is_null($input_is_completed) && $input_is_completed !== $todo[0]->is_completed;
+            $should_update_name = !is_null($input_name) && $input_name !== $todo->name;
+            $should_update_memo = !is_null($input_memo) && $input_memo !== $todo->memo;
+            $should_update_notificate_at = !is_null($input_notificate_at) && $input_notificate_at !== $todo->notificate_at;
+            $should_update_is_completed = !is_null($input_is_completed) && $input_is_completed !== $todo->is_completed;
 
             // TODO名について
-            if ($should_update_name) $updated_todo_arr['name'] = $input_name;
+            if ($should_update_name) $todo->name = $input_name;
             // メモについて
-            if ($should_update_memo) $updated_todo_arr['memo'] = $input_memo;
+            if ($should_update_memo) $todo->memo = $input_memo;
             // 通知の日時について
-            if ($should_update_notificate_at) $updated_todo_arr['notificate_at'] = $input_notificate_at;
+            if ($should_update_notificate_at) $todo->notificate_at = new DateTimeImmutable($input_notificate_at);
             // 完了・未完了について
             if ($should_update_is_completed) {
-                $updated_todo_arr['is_completed'] = $input_is_completed;
+                $todo->is_completed = $input_is_completed;
                 if ($input_is_completed) {
-                    $updated_todo_arr['completed_at'] = $now->format('Y-m-d H:i:s');
+                    $todo->completed_at = $now;
                     self::deleteImcompletedTodoOrder($user_id, $todo_id);
                 } else {
-                    $updated_todo_arr['imcompleted_at'] = $now->format('Y-m-d H:i:s');
+                    $todo->imcompleted_at = $now;
                     self::addImcompletedTodoOrder($user_id, $todo_id);
                 }
             }
 
-            if (count($updated_todo_arr) !== 0) DB::table('todos')
-                ->where('id', $todo_id)
-                ->update($updated_todo_arr);
+            $todo_repository->updateTodo($todo);
             DB::commit();
         } catch (Exception $exception) {
             DB::rollBack();

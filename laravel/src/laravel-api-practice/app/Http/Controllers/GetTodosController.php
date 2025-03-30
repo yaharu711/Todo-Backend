@@ -22,7 +22,7 @@ class GetTodosController extends Controller
             ON todos.user_id = imcompleted_todo_orders.user_id
             JOIN LATERAL unnest(imcompleted_todo_orders.imcompleted_todo_order) WITH ORDINALITY as ord(todo_id, ord)
             ON todos.id = ord.todo_id
-            INNER JOIN todo_notification_schedules
+            LEFT OUTER JOIN todo_notification_schedules
             ON todos.id = todo_notification_schedules.todo_id
             WHERE todos.user_id = ?  AND todos.is_completed = false
             ORDER BY ord.ord;

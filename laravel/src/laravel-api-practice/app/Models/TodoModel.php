@@ -7,12 +7,13 @@ class TodoModel
 {
     public function __construct(
         readonly public int $id,
-        readonly public string $name,
-        readonly public string $memo,
-        readonly public DateTimeImmutable $notificate_at,
+        readonly public int $user_id,
+        public string $name,
+        public string $memo,
+        public DateTimeImmutable|null $notificate_at,
         readonly public DateTimeImmutable $created_at,
-        readonly public DateTimeImmutable $imcompleted_at,
-        readonly public bool $is_completed,
-        readonly public DateTimeImmutable|null $completed_at
+        public DateTimeImmutable $imcompleted_at,
+        public bool $is_completed,
+        public DateTimeImmutable|null $completed_at
     ) {}
 }
