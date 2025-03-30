@@ -59,10 +59,20 @@ class TodoRepository
             $model->memo,
             $model->is_completed,
             $model->imcompleted_at->format('Y-m-d H:i:s'),
-            $model->completed_at->format('Y-m-d H:i:s'),
+            is_null($model->completed_at) ? null : $model->completed_at->format('Y-m-d H:i:s'), // やっぱりTodoモデルも完了・未完了で分けた方が危険少なそう
             $model->id,
         ]);
-        if (is_null($model->notificate_at)) return;
+        if (is_null($model->notificate_at)) {
+            DB::statement('
+                DELETE FROM
+                    todo_notification_schedules
+                WHERE
+                    todo_id = ?
+            ', [
+                $model->id,
+            ]);
+            return ;
+        };
 
         DB::statement('
             INSERT INTO 
@@ -79,7 +89,7 @@ class TodoRepository
                 updated_at = ?
         ', [
             $model->id,
-            $model->notificate_at,
+            $model->notificate_at->format('Y-m-d H:i'),
             $this->now->format('Y-m-d H:i:s'),
             $this->now->format('Y-m-d H:i:s'),
             $this->now->format('Y-m-d H:i:s'),

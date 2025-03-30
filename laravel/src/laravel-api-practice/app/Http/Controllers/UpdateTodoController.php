@@ -32,7 +32,7 @@ class UpdateTodoController extends Controller
 
             $should_update_name = !is_null($input_name) && $input_name !== $todo->name;
             $should_update_memo = !is_null($input_memo) && $input_memo !== $todo->memo;
-            $should_update_notificate_at = !is_null($input_notificate_at) && $input_notificate_at !== $todo->notificate_at;
+            $should_update_notificate_at = $input_notificate_at !== $todo->notificate_at;
             $should_update_is_completed = !is_null($input_is_completed) && $input_is_completed !== $todo->is_completed;
 
             // TODO名について
@@ -40,7 +40,7 @@ class UpdateTodoController extends Controller
             // メモについて
             if ($should_update_memo) $todo->memo = $input_memo;
             // 通知の日時について
-            if ($should_update_notificate_at) $todo->notificate_at = new DateTimeImmutable($input_notificate_at);
+            if ($should_update_notificate_at) $todo->notificate_at = is_null($input_notificate_at) ? null : new DateTimeImmutable($input_notificate_at);
             // 完了・未完了について
             if ($should_update_is_completed) {
                 $todo->is_completed = $input_is_completed;
