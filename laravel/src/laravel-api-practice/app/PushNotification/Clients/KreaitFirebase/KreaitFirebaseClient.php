@@ -46,6 +46,9 @@ class KreaitFirebaseClient
                         'link' => PushNotificationContent::getLink($notification_request->todo_id),
                     ]
                 ],
+                'data' => [
+                    'todo_id' => (string)$notification_request->todo_id,
+                ],
             ];
         }
 

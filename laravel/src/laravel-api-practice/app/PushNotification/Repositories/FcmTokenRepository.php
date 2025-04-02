@@ -33,15 +33,22 @@ class FcmTokenRepository
      */
     public function insertInvalidatedFcmToken(array $failed_notification_dto_list): void
     {
-        $upsertData = array_map(
-            fn($dto) => [
-                'user_id'    => $dto->user_id,
-                'token'      => $dto->token,
-                'created_at' => $this->now,
-            ],
-            $failed_notification_dto_list
-        );
-        DB::table('invalidated_fcm')
-            ->upsert($upsertData, ['user_id', 'token'], []);
+        $values = [];
+        $params = [];
+        
+        foreach ($failed_notification_dto_list as $dto) {
+            $values[] = '(?, ?, ?)';
+            array_push($params, $dto->user_id, $dto->token, $this->now);
+        }
+        
+        if (!empty($values)) {
+            $sql = "
+                INSERT INTO invalidated_fcm (user_id, token, created_at)
+                VALUES " . implode(', ', $values) . "
+                ON CONFLICT (user_id, token) DO NOTHING
+            ";
+        
+            DB::statement($sql, $params);
+        }
     }
 }

@@ -90,6 +90,7 @@ class FcmNotificationResultHandler implements NotificationResultHandlerInterface
                 DB::commit();
             } catch (Exception $exception) {
                 DB::rollBack();
+                dd($exception);
             }
         }
         
