@@ -55,23 +55,22 @@ class FcmSendAllReport
     public function toSuccessNotificationDtoList(
         array $notification_request_list,
     ): array {
-        $notificationsByToken = [];
+        $notificationsByTodoId = [];
         foreach ($notification_request_list as $notification) {
-            if (isset($notification->token)) {
-                $notificationsByToken[$notification->token] = $notification;
-            }
+            $notificationsByTodoId[$notification->todo_id] = $notification;
         }
-        // successes() のレスポンスから、対応する通知を抽出する
+
         $success_responses = $this->successes();
         $success_notification_dto_list = [];
         foreach ($success_responses as $sendReport) {
-            $token = $sendReport->target()->value();
-            if (isset($notificationsByToken[$token])) {
+            $row_message = $sendReport->message();
+            $todo_id = (int)json_decode(json_encode($row_message), true)["data"]["todo_id"];
+            if (isset($notificationsByTodoId[$todo_id])) {
                 $success_notification_dto_list[] = new FcmPushNotificationSuccessDto(
-                    $notificationsByToken[$token]->user_id,
-                    $notificationsByToken[$token]->todo_id,
-                    $notificationsByToken[$token]->token,
-                    $notificationsByToken[$token]->notificated_at
+                    $notificationsByTodoId[$todo_id]->user_id,
+                    $notificationsByTodoId[$todo_id]->todo_id,
+                    $notificationsByTodoId[$todo_id]->token,
+                    $notificationsByTodoId[$todo_id]->notificated_at
                 );
             }
         }
@@ -86,28 +85,29 @@ class FcmSendAllReport
     public function toErrorNotificationDtoList(
         array $notification_request_list,
     ): array {
-        $notificationsByToken = [];
+        $notificationsByTodoId = [];
         foreach ($notification_request_list as $notification) {
-            if (isset($notification->token)) {
-                $notificationsByToken[$notification->token] = $notification;
-            }
+            $notificationsByTodoId[$notification->todo_id] = $notification;
         }
+        $failure_responses = $this->failures();
         $failed_notification_dto_list = [];
-        foreach ($this->failures() as $sendReport) {
-            $token = $sendReport->target()->value();
+        foreach ($failure_responses as $sendReport) {
+            $row_message = $sendReport->message();
+            $todo_id = (int)json_decode(json_encode($row_message), true)["data"]["todo_id"];
             $error_message = $sendReport->error()->getMessage();
-            $invalidated_argument = $sendReport->messageTargetWasInvalid() | $sendReport->messageWasInvalid() | $sendReport->messageWasSentToUnknownToken(); 
-            if (isset($notificationsByToken[$token])) {
+            $is_invalidated_request = $sendReport->messageTargetWasInvalid() | $sendReport->messageWasInvalid() | $sendReport->messageWasSentToUnknownToken(); 
+            if (isset($notificationsByTodoId[$todo_id])) {
                 $failed_notification_dto_list[] = new FcmPushNotificationErrorDto(
-                    $notificationsByToken[$token]->user_id,
-                    $notificationsByToken[$token]->todo_id,
-                    $notificationsByToken[$token]->token,
-                    $notificationsByToken[$token]->notificated_at,
+                    $notificationsByTodoId[$todo_id]->user_id,
+                    $notificationsByTodoId[$todo_id]->todo_id,
+                    $notificationsByTodoId[$todo_id]->token,
+                    $notificationsByTodoId[$todo_id]->notificated_at,
                     $error_message,
-                    $invalidated_argument
+                    $is_invalidated_request
                 );
             }
         }
+
         return $failed_notification_dto_list;
     }
 }
