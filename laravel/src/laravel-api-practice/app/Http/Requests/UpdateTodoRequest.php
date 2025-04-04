@@ -29,4 +29,18 @@ class UpdateTodoRequest extends FormRequest
             }
         });
     }
+
+    /**
+     * ここで'memo'が空の場合は空文字に上書きします。
+     * LaravelはデフォルトでConvertEmptyStringsToNullというミドルウェアを適応するらしい
+     * これにより、input()で取得する時には空文字はnullに変換されてしまうので、空文字が入るようにしている
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('memo') && is_null($this->input('memo'))) {
+            $this->merge([
+                'memo' => '',
+            ]);
+        }
+    }
 }
