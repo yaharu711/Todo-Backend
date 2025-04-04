@@ -13,7 +13,7 @@ class UpdateTodoRequest extends FormRequest
     {
         return [
             'name' => ['string', 'min:1', 'max:100'],
-            'memo' => ['nullable', 'string', 'max:3000'],
+            'memo' => ['string', 'max:3000'],
             'is_completed' => ['boolean'],
         ];
     }
