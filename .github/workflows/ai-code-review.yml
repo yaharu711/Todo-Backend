@@ -22,7 +22,7 @@ jobs:
 
       - name: Create payload.json using jq
         run: |
-          jq -n --arg prompt "以下はPRの差分です。レビュー観点は以下の通りです:
+          jq -n --arg prompt "以下はPRの差分です。出力はMarkdown形式で日本語でお願いします。レビュー観点は以下の通りです:
           【コード品質】
           ・命名の一貫性が保たれているか
           ・シンプルで読みやすい記述で、不要な処理がないか
