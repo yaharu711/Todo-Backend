@@ -22,8 +22,9 @@ class UpdateTodoController extends Controller
         $now = new DateTimeImmutable();
         $input_name = $request->input('name');
         $input_memo = $request->input('memo');
-        $input_notificate_at = $request->input('notificate_at');
+        $input_notificate_at = self::calculateNotificateAt($now, $request->input('notificate_at'));
         $input_is_completed = $request->input('is_completed');
+
 
         DB::beginTransaction();
         try {
@@ -60,6 +61,17 @@ class UpdateTodoController extends Controller
             throw $exception;
         }
         return response()->json(['message' => 'success']);
+    }
+
+    private static function calculateNotificateAt(DateTimeImmutable $now, ?string $input_notificate_at): ?string
+    {
+        $now_minute_formatted = $now->format('Y-m-d H:i');
+        $input_notificate_at_minute_formatted = (new DateTimeImmutable($input_notificate_at))->format('Y-m-d H:i');
+        $is_input_notificate_at_before_now = !is_null($input_notificate_at) && $now_minute_formatted >= $input_notificate_at_minute_formatted;
+        // 通知を設定して、通知の時間が来るまで（来たあとも）リロードしていないユーザがいる
+        // その時memoの更新などを行った時、再度notificate_atが登録されてしまうことを防いでいる
+        return $is_input_notificate_at_before_now ? null : $input_notificate_at;
+
     }
 
     private static function addImcompletedTodoOrder(int $user_id, int $todo_id): void
