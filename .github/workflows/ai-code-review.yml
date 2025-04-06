@@ -48,7 +48,7 @@ jobs:
           EOF
           )
           # 差分をプロンプトに挿入
-          PROMPT_WITH_DIFF=$(echo "$PROMPT" | sed "s/<<DIFF_PLACEHOLDER>>/$DIFF_CONTENT/")
+          PROMPT_WITH_DIFF=$(echo "$PROMPT" | sed "s@<<DIFF_PLACEHOLDER>>@$DIFF_CONTENT@")
           # OpenAI APIにリクエストを送信（modelはgpt-4oを使用）
           RESPONSE=$(curl -sS https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
@@ -63,7 +63,6 @@ jobs:
           echo "$RESPONSE" > response.json
           REVIEW_COMMENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
           echo "review_comment=$REVIEW_COMMENT" >> $GITHUB_OUTPUT
-
       - name: Post review comment to PR
         uses: actions/github-script@v6
         with:
