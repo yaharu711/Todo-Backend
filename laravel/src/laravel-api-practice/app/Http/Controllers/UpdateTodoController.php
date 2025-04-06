@@ -22,7 +22,7 @@ class UpdateTodoController extends Controller
         $now = new DateTimeImmutable();
         $input_name = $request->input('name');
         $input_memo = $request->input('memo');
-        $input_notificate_at = self::calculateNotificateAt($now, $request->input('notificate_at'));
+        $input_notificate_at = $this->calculateNotificateAt($now, $request->input('notificate_at'));
         $input_is_completed = $request->input('is_completed');
 
 
@@ -47,10 +47,10 @@ class UpdateTodoController extends Controller
                 $todo->is_completed = $input_is_completed;
                 if ($input_is_completed) {
                     $todo->completed_at = $now;
-                    self::deleteImcompletedTodoOrder($user_id, $todo_id);
+                    $this->deleteImcompletedTodoOrder($user_id, $todo_id);
                 } else {
                     $todo->imcompleted_at = $now;
-                    self::addImcompletedTodoOrder($user_id, $todo_id);
+                    $this->addImcompletedTodoOrder($user_id, $todo_id);
                 }
             }
 
@@ -63,7 +63,7 @@ class UpdateTodoController extends Controller
         return response()->json(['message' => 'success']);
     }
 
-    private static function calculateNotificateAt(DateTimeImmutable $now, ?string $input_notificate_at): ?string
+    private function calculateNotificateAt(DateTimeImmutable $now, ?string $input_notificate_at): ?string
     {
         $now_minute_formatted = $now->format('Y-m-d H:i');
         $input_notificate_at_minute_formatted = (new DateTimeImmutable($input_notificate_at))->format('Y-m-d H:i');
@@ -74,7 +74,7 @@ class UpdateTodoController extends Controller
 
     }
 
-    private static function addImcompletedTodoOrder(int $user_id, int $todo_id): void
+    private function addImcompletedTodoOrder(int $user_id, int $todo_id): void
     {
         DB::statement('
             UPDATE imcompleted_todo_orders 
@@ -83,7 +83,7 @@ class UpdateTodoController extends Controller
         ', [$todo_id, $user_id]);
     }
 
-    private static function deleteImcompletedTodoOrder(int $user_id, int $todo_id): void
+    private function deleteImcompletedTodoOrder(int $user_id, int $todo_id): void
     {
         // 特定要素へのリクエストなので、配列の規模が大きくなるほどパフォーマンス低下する。。
         DB::statement('
