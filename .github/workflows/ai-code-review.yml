@@ -66,23 +66,24 @@ jobs:
           echo "Response from OpenAI:"
           cat response.json
           REVIEW_COMMENT=$(jq -r '.choices[0].message.content' response.json)
-          # マルチラインの出力を設定するための方法
-          echo "review_comment<<EOF" >> $GITHUB_OUTPUT
-          echo "$REVIEW_COMMENT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          # Base64エンコードして出力（改行や特殊文字の影響を回避）
+          ENCODED=$(echo "$REVIEW_COMMENT" | base64)
+          echo "review_comment=$ENCODED" >> $GITHUB_OUTPUT
 
       - name: Post review comment to PR
         uses: actions/github-script@v6
         with:
           script: |
-            const reviewComment = "${{ steps.openai_review.outputs.review_comment }}";
-            if (reviewComment && reviewComment !== 'null') {
-              github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.pull_request.number,
-                body: reviewComment
-              });
-            } else {
-              throw new Error('No review comment generated.');
+            // 出力変数（base64エンコード済み）の値を取得
+            const encoded = "${{ steps.openai_review.outputs.review_comment }}";
+            if (!encoded || encoded === "null") {
+              throw new Error("No review comment generated.");
             }
+            // Node.jsのBufferでデコード
+            const reviewComment = Buffer.from(encoded, 'base64').toString('utf8');
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: reviewComment
+            });
