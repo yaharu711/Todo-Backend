@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 
 class ImcompletedTodoOrderRepository
 {
-    public function insert(int $user_id, int $todo_id): void
+    public function insertAsFirst(int $user_id, int $todo_id): void
     {
         DB::statement('
             UPDATE imcompleted_todo_orders 
