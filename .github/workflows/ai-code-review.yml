@@ -5,7 +5,16 @@ permissions:
   pull-requests: write
 on:
   pull_request:
+    # OpenAIのusageを監視してあまりにもトークン消費が早ければopenedイベントのみにする
     types: [opened, synchronize]
+    paths-ignore:
+      - "laravel/src/laravel-api-practice/composer.json"
+      - "laravel/src/laravel-api-practice/composer.lock"
+      - "laravel/src/laravel-api-practice/package.json"
+      - "laravel/src/laravel-api-practice/package-lock.json"
+      - "laravel/src/laravel-api-practice/README.md"
+      - "laravel/src/laravel-api-practice/.env.example"
+      - "laravel/src/laravel-api-practice/storage/**"
 
 jobs:
   review:
