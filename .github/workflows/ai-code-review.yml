@@ -21,7 +21,6 @@ jobs:
           git diff origin/$DEFAULT_BRANCH..HEAD > diff.patch
           echo "Created diff file:"
           cat diff.patch
-
       - name: Create payload.json using jq
         run: |
           jq -n --arg prompt "以下はPRの差分です。出力はMarkdown形式で日本語でお願いします。レビュー観点は以下の通りです:
@@ -50,6 +49,8 @@ jobs:
               ],
               "temperature": 0.2
             }' > payload.json
+          echo "Created payload.json:"
+          cat payload.json
       - name: Call OpenAI API for review
         id: openai_review
         env:
