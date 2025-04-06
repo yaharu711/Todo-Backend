@@ -48,12 +48,6 @@ jobs:
               ],
               "temperature": 0.2
             }' > payload.json
-          # エラーが返ってきていないかチェック
-          if jq -e '.error' response.json > /dev/null; then
-            echo "Error from OpenAI API:" >&2
-            jq .error response.json >&2
-            exit 1
-          fi
       - name: Call OpenAI API for review
         id: openai_review
         env:
@@ -63,6 +57,12 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
             -d @payload.json > response.json
+          # エラーが返ってきていないかチェック
+          if jq -e '.error' response.json > /dev/null; then
+            echo "Error from OpenAI API:" >&2
+            jq .error response.json >&2
+            exit 1
+          fi
           echo "Response from OpenAI:"
           cat response.json
           REVIEW_COMMENT=$(jq -r '.choices[0].message.content' response.json)
