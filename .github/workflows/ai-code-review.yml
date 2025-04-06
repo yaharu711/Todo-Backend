@@ -1,6 +1,8 @@
 # .github/workflows/ai-code-review.yml
 name: AI Code Review
-
+permissions:
+  issues: write
+  pull-requests: write
 on:
   pull_request:
     types: [opened, synchronize]
