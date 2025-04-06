@@ -14,8 +14,9 @@ jobs:
 
       - name: Create diff file
         run: |
-          git fetch origin main
-          git diff origin/main...HEAD > diff.patch
+          DEFAULT_BRANCH=${{ github.event.repository.default_branch }}
+          git fetch origin $DEFAULT_BRANCH
+          git diff origin/$DEFAULT_BRANCH...HEAD > diff.patch
           echo "Created diff file:"
           cat diff.patch
 
