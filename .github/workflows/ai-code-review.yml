@@ -1,0 +1,80 @@
+# .github/workflows/ai-code-review.yml
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create diff file
+        run: |
+          git fetch origin main
+          git diff origin/main...HEAD > diff.patch
+          echo "Created diff file:"
+          cat diff.patch
+
+      - name: Call OpenAI API for Review
+        id: openai_review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # 読み込んだdiffを変数に格納
+          DIFF_CONTENT=$(cat diff.patch)
+          # プロンプト内容。{diff_patch} の部分に実際のdiffを差し込みます
+          PROMPT=$(cat <<'EOF'
+以下はLaravelプロジェクトのPRの差分です。以下の観点を確認してください。
+【コード品質】
+- 命名が一貫していること
+- シンプルで読みやすく、不要な処理がないこと
+- 単一責任が守られ、修正しやすく影響範囲が限定されていること
+- 一貫したアーキテクチャになっていること（レイヤーの責務、命名規則の遵守）
+
+【テスト】
+- 正常系: 取得・更新時に期待した値が得られる、境界値・エッジケース（null、空配列など）も考慮されていること
+- 異常系: 例外が適切に発生すること
+
+【セキュリティ】
+- セキュリティ上の脅威がないか。もし懸念があれば、その点について質問してください。
+
+以下にPRの差分があります：
+<<DIFF_PLACEHOLDER>>
+EOF
+)
+          # 差分をプロンプトに挿入
+          PROMPT_WITH_DIFF=$(echo "$PROMPT" | sed "s/<<DIFF_PLACEHOLDER>>/$DIFF_CONTENT/")
+          # OpenAI APIにリクエストを送信（modelはgpt-4oを使用）
+          RESPONSE=$(curl -sS https://api.openai.com/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
+            -d '{
+              "model": "gpt-4o",
+              "messages": [
+                {"role": "user", "content": "'"$PROMPT_WITH_DIFF"'"}
+              ],
+              "temperature": 0.2
+            }')
+          echo "$RESPONSE" > response.json
+          REVIEW_COMMENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+          echo "review_comment=$REVIEW_COMMENT" >> $GITHUB_OUTPUT
+
+      - name: Post review comment to PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const reviewComment = process.env.review_comment;
+            if (reviewComment && reviewComment !== 'null') {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: reviewComment
+              });
+            } else {
+              console.log('No review comment was generated.');
+            });
