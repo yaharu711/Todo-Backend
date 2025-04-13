@@ -75,9 +75,9 @@ return [
 
         'slack' => [
             'driver' => 'slack',
+            // プレーンテキスト形式で送信するときしかカスタムフォーマットは使えない。。'useAttachment' を false に設定しないといけない
+            // 'formatter' => App\Logging\CustomSlackFormatter::class,
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
-            'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
-            'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
             'level' => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
         ],
