@@ -41,7 +41,7 @@ class HttpExceptionHandler
     private function render(): void
     {
         $this->exceptions->render(function (Throwable $e) {
-            return response()->json(['messege' => '予期しないエラーが発生しました。'], 500);
+            return response()->json(['message' => '予期しないエラーが発生しました。'], 500);
         });
     }
 }
