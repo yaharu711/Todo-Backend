@@ -55,7 +55,6 @@ class UpdateTodoController extends Controller
                 }
             }
 
-            throw new Exception('テスト用の例外です');
             $todo_repo->updateTodo($todo);
             DB::commit();
         } catch (Exception $exception) {

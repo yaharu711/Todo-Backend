@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Exception;
+namespace App\CustomException;
 
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class CustomExceptionHandlerInHttp
+class HttpExceptionHandler
 {
     public function __construct(
         readonly private Exceptions $exceptions,

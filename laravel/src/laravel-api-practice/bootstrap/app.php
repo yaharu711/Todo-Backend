@@ -1,7 +1,7 @@
 <?php
 
 use App\CustomMiddleware\CustomEnsureFrontendRequestsAreStateful;
-use App\Exception\CustomExceptionHandlerInHttp;
+use App\CustomException\HttpExceptionHandler;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         $request = request();
         if ($request instanceof Request) {
-            $handler = new CustomExceptionHandlerInHttp($exceptions, $request);
+            $handler = new HttpExceptionHandler($exceptions, $request);
             $handler->handle();
         } else {
             $exceptions->report(function (Throwable $e) {
