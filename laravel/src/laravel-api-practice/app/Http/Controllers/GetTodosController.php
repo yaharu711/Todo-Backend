@@ -14,6 +14,7 @@ class GetTodosController extends Controller
     public function __invoke(): JsonResponse
     {
         $user_id = Auth::user()->id;
+
         // 未完了のTODOには並び替え機能があるため、以下のようなSQLを実行する
         $imcompletedTodos = DB::select('
             SELECT todos.*, todo_notification_schedules.notificate_at
