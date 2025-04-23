@@ -1,5 +1,6 @@
 .env
 ./laravel/laravel_error.log
 laravel/local/secrets/
+laravel/local/dns/vendor/
 .env.local
 .env.production
