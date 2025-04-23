@@ -1,0 +1,17 @@
+{
+  "name": "local/dns",
+  "autoload": {
+    "psr-4": {
+      "Dns\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "yaharu",
+      "email": "example@gmail.com"
+    }
+  ],
+  "require": {
+    "vlucas/phpdotenv": "^5.6"
+  }
+}
