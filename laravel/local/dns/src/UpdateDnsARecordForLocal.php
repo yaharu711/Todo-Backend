@@ -11,7 +11,7 @@ class UpdateDnsARecordForLocal
     {  
         // 現在のAレコードを取得
         $current_record_content = $this->dnsRecord->getRecord();
-        // ホストマシンのIPアドレスを取得
+        // ホストマシンのIPアドレスを取得（一旦Mac上で動作させること前提にしている）
         $host_ip_address = trim(shell_exec('ipconfig getifaddr en0'));
         if ($current_record_content === $host_ip_address) {
             return;
