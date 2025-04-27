@@ -2,5 +2,6 @@
 ./laravel/laravel_error.log
 laravel/local/secrets/
 laravel/local/dns/vendor/
+laravel/local/dns/run-update-dns-a-record-job.log
 .env.local
 .env.production
