@@ -5,5 +5,6 @@ namespace Dns;
 
 interface DnsRecordInterface
 {
-    public function getRecord(int $recordId, string $recordName): string;
+    public function getRecord(): ?string;
+    public function updateRecord(string $content): void;
 }
