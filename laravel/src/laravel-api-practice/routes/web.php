@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\CallbackLineAuthController;
 use App\Http\Controllers\CheckLoginedController;
+use App\Http\Controllers\CreateLineAuthUrlController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\RegistController;
@@ -21,3 +23,9 @@ Route::post('/logout', LogoutController::class)
 // 認証系のミドルウェアを使っていないから？挙動がおかしい？でも、だとしたらセッション管理について、どのようなロジックが適応されている？
 Route::post('/check-login', CheckLoginedController::class)
     ->withoutMiddleware(ValidateCsrfToken::class);
+
+// LINEログインのためのURLを生成するAPIを実装
+Route::get('line-auth/url', CreateLineAuthUrlController::class);
+// Callback先のAPIを実装
+Route::get('line-auth/callback', CallbackLineAuthController::class);
+// プロフィールを取得するAPIを実装
