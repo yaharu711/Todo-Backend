@@ -34,5 +34,11 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'line_login' => [
+        'client_id' => env('LINE_LOGIN_CLIENT_ID'),
+        'client_secret' => env('LINE_LOGIN_CLIENT_SECRET'),
+        'redirect_uri' => env('LINE_LOGIN_REDIRECT_URI'),
+        'scope' => env('LINE_LOGIN_SCOPE'),
+        'auth_endpoint' => env('LINE_LOGIN_AUTH_ENDPOINT'),
+    ],
 ];
