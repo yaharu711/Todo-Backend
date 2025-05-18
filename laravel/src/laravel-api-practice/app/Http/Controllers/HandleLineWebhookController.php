@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\LineBotService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -60,7 +61,14 @@ class HandleLineWebhookController extends Controller
     {
         $line_bot_service = new LineBotService();
         if ($type === 'follow' || $type === 'unfollow') {
-            $line_bot_service->updateFollowStatus($line_user_id, $type === 'follow');
+            try {
+                $line_bot_service->updateFollowStatus($line_user_id, $type === 'follow');
+            } catch (Exception $e) {
+                Log::error('LINE Webhook: ' . $e->getMessage(), [
+                    'line_user_id' => $line_user_id,
+                    'type'         => $type,
+                ]);
+            }
         }
     }
 }
