@@ -41,4 +41,7 @@ return [
         'scope' => env('LINE_LOGIN_SCOPE'),
         'auth_endpoint' => env('LINE_LOGIN_AUTH_ENDPOINT'),
     ],
+    'line_bot' => [
+        'secret' => env('LINE_BOT_CHANNEL_SECRET'),
+    ]
 ];
