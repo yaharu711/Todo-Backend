@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace App\Repositories;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class LineUserProfileRepository
@@ -17,5 +18,10 @@ class LineUserProfileRepository
         ->json();
 
         return $profile['userId'];
+    }
+
+    public function updateFollowStatus(string $line_user_id, bool $follow_flg): void
+    {
+        DB::statement('UPDATE line_user_relation SET friend_flg = ? WHERE line_user_id = ?', [$follow_flg, $line_user_id]);
     }
 }
