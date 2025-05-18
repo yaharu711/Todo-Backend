@@ -10,7 +10,7 @@ class LineLoginAccessTokenRepository
     /**
      * @see https://developers.line.biz/ja/reference/line-login/#issue-access-token
      */
-    public function iussueAccessToken(string $code): string
+    public function issueAccessToken(string $code): string
     {
         // TODO: リプレイアタック防止のため、stateだけだと弱いので、PKCEを使うようにする。
         $response = Http::asForm()->post('https://api.line.me/oauth2/v2.1/token', [
