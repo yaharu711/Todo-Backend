@@ -60,7 +60,7 @@ class HandleLineWebhookController extends Controller
     {
         $line_bot_service = new LineBotService();
         if ($type === 'follow' || $type === 'unfollow') {
-            $line_bot_service->updateFollowStatus($line_user_id);
+            $line_bot_service->updateFollowStatus($line_user_id, $type === 'follow');
         }
     }
 }
