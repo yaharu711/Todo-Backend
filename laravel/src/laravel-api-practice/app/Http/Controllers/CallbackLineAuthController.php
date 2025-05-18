@@ -42,8 +42,11 @@ class CallbackLineAuthController extends Controller
             return redirect()->away(config('app.frontend_url').'/setting');
         }
 
+        // 本番環境にLINE周りとfrontend_app_urlの環境変数を設定する。
         // - 新規登録
-        // - ログイン
+            // usersテーブルに新規レコードを作成する
+        // - 新規登録済み、連携済みのログイン
+            // 何もしないで、Auth::login()を使用して、ユーザーをログインさせる
         // Auth::id()がnullの場合はusersテーブルに新規レコードを作成する
             // すでにレコードが存在する場合は、何もしない
             // これは設定画面からLINEログインを行うユーザもいるため（既存ユーザー用）
