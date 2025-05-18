@@ -33,7 +33,7 @@ class CallbackLineAuthController extends Controller
         $line_user_profile_repository = new LineUserProfileRepository();
         $user_line_relation_repository = new UserLineRelationRepository();
 
-        $access_token = $line_login_access_token_repository->iussueAccessToken($code);
+        $access_token = $line_login_access_token_repository->issueAccessToken($code);
         $line_user_id = $line_user_profile_repository->getLineUserIdByLoginApi($access_token);
         $user_id = Auth::id();
         if ($user_id !== null) { // 設定画面からのLINE連携の場合
