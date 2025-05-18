@@ -44,10 +44,13 @@ class HandleLineWebhookController extends Controller
             $source = $event['source']  ?? [];
             $user_id = $source['userId'] ?? null;
 
-            if (!Str::startsWith($user_id, 'U')) {
-                continue;  // 現在（2025/05/18時点）はグループ・ルームは対象外
+            // グループやルームは無視
+            if (($source['type'] ?? null) !== 'user') {
+                continue;
             }
-            
+            if ($user_id === null) {
+                continue;   // 念のため null ガード
+            }
             $this->routeWebhookEvent($type, $user_id);
         }
 
@@ -56,7 +59,7 @@ class HandleLineWebhookController extends Controller
     private function routeWebhookEvent(string $type, string $line_user_id)
     {
         $line_bot_service = new LineBotService();
-        if ($type === 'follow' || $type === 'follow') {
+        if ($type === 'follow' || $type === 'unfollow') {
             $line_bot_service->updateFollowStatus($line_user_id);
         }
     }
