@@ -3,6 +3,7 @@
 use App\Http\Controllers\CallbackLineAuthController;
 use App\Http\Controllers\CheckLoginedController;
 use App\Http\Controllers\CreateLineAuthUrlController;
+use App\Http\Controllers\HandleLineWebhookController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\RegistController;
@@ -24,8 +25,12 @@ Route::post('/logout', LogoutController::class)
 Route::post('/check-login', CheckLoginedController::class)
     ->withoutMiddleware(ValidateCsrfToken::class);
 
-// LINEログインのためのURLを生成するAPIを実装
+// LINEログインのためのURLを生成するAPI
 Route::get('line-auth/url', CreateLineAuthUrlController::class);
 // Callback先のAPIを実装
 Route::get('line-auth/callback', CallbackLineAuthController::class);
 // プロフィールを取得するAPIを実装
+
+// Line WebhookのためのAPI
+Route::post('line/webhook', HandleLineWebhookController::class)
+    ->withoutMiddleware(ValidateCsrfToken::class);
