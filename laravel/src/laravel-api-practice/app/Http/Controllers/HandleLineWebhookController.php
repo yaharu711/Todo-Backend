@@ -31,10 +31,7 @@ class HandleLineWebhookController extends Controller
         $hash = base64_encode(hash_hmac('sha256', $raw_body, $channel_secret, true));
 
         if (!hash_equals($hash, $signature ?? '')) {
-            Log::error('LINE Webhook: invalid signature', [
-                'signature' => $signature,
-                'hash'      => $hash,
-            ]);
+            Log::error('LINE Webhook: invalid signature');
             return response()->json(['message' => 'invalid signature'], 400);
         }
 
