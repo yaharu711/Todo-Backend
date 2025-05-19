@@ -27,12 +27,12 @@ class LineUserProfileRepository
     {
         DB::statement('
             UPDATE line_user_relation 
-            SET friend_flg = ?, updated_at = ? 
-            WHERE line_user_id = ?', 
+            SET friend_flag = ?, updated_at = ? 
+            WHERE line_user_id = ?',
             [
                 $follow_flg, 
-                $line_user_id,
                 $this->now,
+                $line_user_id,
             ]
         );
     }
