@@ -23,6 +23,7 @@ class CallbackLineAuthController extends Controller
         if (!$code || !$state) {
             // codeまたはstateが存在しない場合は、403エラーを返す
             return response()->json(['error' => 'query parameter is invalid'], 403);
+            return response()->json(['error' => 'query parameter is invalid'], 403);
         }
         if (!$this->isValidState($request, $now, $state)) {
             // セッションにline_loginが存在しない場合は、403エラーを返す
@@ -30,7 +31,7 @@ class CallbackLineAuthController extends Controller
         }
 
         $line_login_access_token_repository = new LineLoginAccessTokenRepository();
-        $line_user_profile_repository = new LineUserProfileRepository();
+        $line_user_profile_repository = new LineUserProfileRepository($now);
         $user_line_relation_repository = new UserLineRelationRepository();
 
         $access_token = $line_login_access_token_repository->issueAccessToken($code);
