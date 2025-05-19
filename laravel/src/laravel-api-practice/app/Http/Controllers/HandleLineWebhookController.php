@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Services\LineBotService;
+use DateTimeImmutable;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class HandleLineWebhookController extends Controller
 {
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
         $raw_body   = $request->getContent();
         /**
@@ -30,7 +31,7 @@ class HandleLineWebhookController extends Controller
         $hash = base64_encode(hash_hmac('sha256', $raw_body, $channel_secret, true));
 
         if (!hash_equals($hash, $signature ?? '')) {
-            Log::warning('LINE Webhook: invalid signature');
+            Log::error('LINE Webhook: invalid signature');
             return response()->json(['message' => 'invalid signature'], 400);
         }
 
@@ -55,11 +56,14 @@ class HandleLineWebhookController extends Controller
             $this->routeWebhookEvent($type, $user_id);
         }
 
+        return response()->json(['message' => 'ok'], 200);
     }
 
-    private function routeWebhookEvent(string $type, string $line_user_id)
+    private function routeWebhookEvent(string $type, string $line_user_id): void
     {
-        $line_bot_service = new LineBotService();
+        $now = new DateTimeImmutable();
+        $line_bot_service = new LineBotService($now);
+
         if ($type === 'follow' || $type === 'unfollow') {
             try {
                 $line_bot_service->updateFollowStatus($line_user_id, $type === 'follow');
