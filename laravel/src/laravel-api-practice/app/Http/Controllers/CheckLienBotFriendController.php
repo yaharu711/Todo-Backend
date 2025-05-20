@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\LineUserRelationRepository;
 use DateTimeImmutable;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class CheckLienBotFriendController extends Controller
@@ -12,7 +12,7 @@ class CheckLienBotFriendController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(): JsonResponse
     {
         $now = new DateTimeImmutable();
         $line_user_profile_repository = new LineUserRelationRepository($now);
