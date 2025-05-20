@@ -20,7 +20,11 @@ class CheckLienBotFriendController extends Controller
 
         $line_user_relation = $line_user_profile_repository->getLineUserRelation($user_id);
         if ($line_user_relation === null) {
-            return response()->json(['error' => 'user not found'], 404);
+            // 存在しないということは、そもそもLINEログインをしていない＝友達ではないということになる
+            return response()->json([
+                'message' => 'success',
+                'friend_flag' => false,
+            ]);
         }
 
         return response()->json([
