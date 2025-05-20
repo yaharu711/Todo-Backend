@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Repositories\LineUserRelationRepository;
+use DateTimeImmutable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class CheckLienBotFriendController extends Controller
+{
+    /**
+     * Handle the incoming request.
+     */
+    public function __invoke(Request $request)
+    {
+        $now = new DateTimeImmutable();
+        $line_user_profile_repository = new LineUserRelationRepository($now);
+        $user_id = Auth::id();
+
+        $line_user_relation = $line_user_profile_repository->getLineUserRelation($user_id);
+        if ($line_user_relation === null) {
+            return response()->json(['error' => 'user not found'], 404);
+        }
+
+        return response()->json([
+            'message' => 'success',
+            'friend_flag' => $line_user_relation->friend_flag,
+        ]);
+    }
+}
