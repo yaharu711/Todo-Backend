@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\LineUserRelationRepository;
 use App\Services\LineBotService;
 use DateTimeImmutable;
 use Exception;
@@ -62,7 +63,8 @@ class HandleLineWebhookController extends Controller
     private function routeWebhookEvent(string $type, string $line_user_id): void
     {
         $now = new DateTimeImmutable();
-        $line_bot_service = new LineBotService($now);
+        $line_user_profile_repository = new LineUserRelationRepository($now);
+        $line_bot_service = new LineBotService($line_user_profile_repository, $now);
 
         if ($type === 'follow' || $type === 'unfollow') {
             try {
