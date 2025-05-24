@@ -3,6 +3,7 @@
 use App\Http\Controllers\CheckExistValidFcmToken;
 use App\Http\Controllers\CheckHealthController;
 use App\Http\Controllers\CheckLienBotFriendController;
+use App\Http\Controllers\CheckLineBotFriendController;
 use App\Http\Controllers\CreateTodoController;
 use App\Http\Controllers\DeleteTodoController;
 use App\Http\Controllers\GetTodosController;
@@ -23,7 +24,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/fcm', SaveFcmTokenController::class);
     Route::post('fcm/invalidate', InvalidateLatestFcmTokenController::class); // fcmトークンは一応残しておきたいから論理削除みたいにしている。
     Route::get('/fcm/check-exist-valid-token', CheckExistValidFcmToken::class);
-    Route::get('/line/check-friend', CheckLienBotFriendController::class);
+    Route::get('/line/check-friend', CheckLineBotFriendController::class);
 });
 
 # この通知APIは知らない人に叩かれたところでAPIを叩く人起点で何か変わることはなく、アプリケーションのロジックで通知が実行されるかされないか決まるだけなので、認証は不要

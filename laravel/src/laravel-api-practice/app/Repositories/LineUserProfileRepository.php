@@ -23,14 +23,14 @@ class LineUserProfileRepository
         return $profile['userId'];
     }
 
-    public function updateFollowStatus(string $line_user_id, bool $follow_flg): void
+    public function updateFollowStatus(string $line_user_id, bool $friend_flag): void
     {
         DB::statement('
             UPDATE line_user_relation 
             SET friend_flag = ?, updated_at = ? 
             WHERE line_user_id = ?',
             [
-                $follow_flg, 
+                $friend_flag, 
                 $this->now,
                 $line_user_id,
             ]
