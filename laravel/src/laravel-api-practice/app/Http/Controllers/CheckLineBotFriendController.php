@@ -7,7 +7,7 @@ use DateTimeImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
-class CheckLienBotFriendController extends Controller
+class CheckLineBotFriendController extends Controller
 {
     /**
      * Handle the incoming request.
