@@ -26,6 +26,7 @@ class PushNotificationController extends Controller
         $fcm_token_repository = new FcmTokenRepository($now);
         $handler = new FcmNotificationResultHandler($now, $todo_notification_schedule_repository, $fcm_token_repository);
 
+        // TODO: FCMトークンがあれば通知するようにする（if文追加）
         $result = $messaging->run();
         // 通知の結果をハンドリングする
         //（このようにハンドリングを分離することで、単一責任を守りテストがしやすく影響範囲が閉じた設計にしている）
