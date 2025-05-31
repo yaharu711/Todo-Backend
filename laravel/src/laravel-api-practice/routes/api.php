@@ -12,6 +12,7 @@ use App\Http\Controllers\InvalidateLatestFcmTokenController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\SaveFcmTokenController;
 use App\Http\Controllers\SortTodosController;
+use App\Http\Controllers\SwitchLineNotificationController;
 use App\Http\Controllers\UpdateTodoController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/todos/sort', SortTodosController::class); // 並び順はリクエストのたびにリクエストされたもので置き換えるので冪等という意味でput
     Route::post('/fcm', SaveFcmTokenController::class);
     Route::post('fcm/invalidate', InvalidateLatestFcmTokenController::class); // fcmトークンは一応残しておきたいから論理削除みたいにしている。
+    Route::patch('line/notification', SwitchLineNotificationController::class);
     Route::get('/fcm/check-exist-valid-token', CheckExistValidFcmToken::class);
     Route::get('/line/check-friend', CheckLineBotFriendController::class);
 });
