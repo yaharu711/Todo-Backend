@@ -22,6 +22,5 @@ class SwitchLineNotificationController extends Controller
 
         $repository->updateNotificationStatus($userId, $is_notification, $now);
         return response()->json(['message' => 'success'], 200);
-
     }
 }
