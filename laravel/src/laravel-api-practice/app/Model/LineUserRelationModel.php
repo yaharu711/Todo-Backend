@@ -13,6 +13,7 @@ class LineUserRelationModel
         readonly public bool $friend_flag,
         readonly public DateTimeImmutable $created_at,
         readonly public DateTimeImmutable $updated_at,
+        readonly public bool $is_notification=false
     ) {
     }
 }

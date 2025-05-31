@@ -19,7 +19,8 @@ class LineUserRelationRepository
                 line_user_id,
                 friend_flag,
                 created_at,
-                updated_at
+                updated_at,
+                is_notification
             FROM line_user_relation 
             WHERE user_id = ?',
             [$user_id]
@@ -34,6 +35,7 @@ class LineUserRelationRepository
             friend_flag: $result[0]->friend_flag,
             created_at: new DateTimeImmutable($result[0]->created_at),
             updated_at: new DateTimeImmutable($result[0]->updated_at),
+            is_notification: $result[0]->is_notification
         );
     }
 
@@ -47,6 +49,20 @@ class LineUserRelationRepository
                 $follow_flg, 
                 $this->now,
                 $line_user_id,
+            ]
+        );
+    }
+
+    public function updateNotificationStatus(int $user_id, bool $is_notification): void
+    {
+        DB::statement('
+            UPDATE line_user_relation 
+            SET is_notification = ?, updated_at = ? 
+            WHERE user_id = ?',
+            [
+                $is_notification, 
+                $this->now,
+                $user_id,
             ]
         );
     }
