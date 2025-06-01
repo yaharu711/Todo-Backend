@@ -21,7 +21,10 @@ class GetLineNotificationStatusController extends Controller
 
         $line_user_relation = $repository->getLineUserRelation($userId);
         if ($line_user_relation === null) {
-            return response()->json(['message' => 'not found user line relation'], 404);
+            return response()->json([
+                'message' => 'not found user line relation',
+                'is_notification' => false, // LINE連携していない場合は通知の設定ができないため、falseにする
+            ], 200);
         }
 
         return response()->json([
