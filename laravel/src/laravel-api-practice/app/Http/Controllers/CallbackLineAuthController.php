@@ -38,6 +38,8 @@ class CallbackLineAuthController extends Controller
         $line_user_id = $line_user_profile_repository->getLineUserIdByLoginApi($access_token);
         $user_id = Auth::id();
         if ($user_id !== null) { // 設定画面からのLINE連携の場合
+            // TODO: 同じLINEアカウントで別のユーザーとしてログインする場合はエラーになる。
+            // その時は、Slackに通知してユーザーには500ページを表示するようにする。
             $user_line_relation_repository->upsert($user_id, $line_user_id, $now);
             // (デフォルトで302リダイレクト)。設定画面に戻るようにする。
             return redirect()->away(config('app.frontend_url').'/setting');
