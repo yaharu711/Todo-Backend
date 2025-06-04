@@ -15,23 +15,39 @@ class LinePushNotificationMessageDto
         int $todo_id,
         string $todo_name,
     ): self {
-        $text = "「{$todo_name}」\nのリマインドです！$";
-        $emoji_index = mb_strlen($text) - 1; // 絵文字のインデックスは先頭が0なので、文字列の長さから1を引く
+        $text = "\${$todo_name}$\nのリマインドです$";
+        $first_emoji_index = 0; // 絵文字のインデックスは先頭が0
+        $second_emoji_index = mb_strlen($todo_name) + 1;
+        $last_emoji_index = mb_strlen($text) - 1;
+
         $notificated_todo_url = PushNotificationContent::getLink($todo_id);
 
         return new self([
             [
                 'type' => 'text',
                 'text' => "{$text}\n{$notificated_todo_url}",
+                /**
+                 * 絵文字について
+                 * @see https://developers.line.biz/ja/docs/messaging-api/emoji-list/#line-emoji-definitions
+                 */
                 'emojis' => [
                     [
-                        'index' => $emoji_index,
-                        /**
-                         * 通知マークの絵文字
-                         * @see https://developers.line.biz/ja/docs/messaging-api/emoji-list/#line-emoji-definitions
-                         */
-                        'productId' => '5ac21a18040ab15980c9b43e',
-                        'emojiId' => '009',
+                        // 「 の絵文字
+                        'index' => $first_emoji_index,
+                        'productId' => '5ac21b4f031a6752fb806d59',
+                        'emojiId' => '114',
+                    ],
+                    [
+                        // 」の絵文字
+                        'index' => $second_emoji_index,
+                        'productId' => '5ac21b4f031a6752fb806d59',
+                        'emojiId' => '115',
+                    ],
+                    [
+                        // !の絵文字
+                        'index' => $last_emoji_index,
+                        'productId' => '5ac21b4f031a6752fb806d59',
+                        'emojiId' => '067',
                     ],
                 ],
             ],
