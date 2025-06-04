@@ -15,7 +15,7 @@ class LinePushNotificationMessageDto
         int $todo_id,
         string $todo_name,
     ): self {
-        $text = "{$todo_name}のリマインドです！$";
+        $text = "「{$todo_name}」\nのリマインドです！$";
         $emoji_index = mb_strlen($text) -1; // 絵文字のインデックスは先頭が0なので、文字列の長さから1を引く
         $notificated_todo_url = PushNotificationContent::getLink($todo_id);
 

@@ -43,5 +43,6 @@ return [
     ],
     'line_bot' => [
         'secret' => env('LINE_BOT_CHANNEL_SECRET'),
+        'access_token' => env('LINE_BOT_CHANNEL_ACCESS_TOKEN'),
     ]
 ];
