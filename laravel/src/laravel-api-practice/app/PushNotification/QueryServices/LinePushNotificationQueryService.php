@@ -31,11 +31,11 @@ class LinePushNotificationQueryService
             ON
                 todos.user_id = line_user_relation.user_id
             WHERE
-                to_char(todo_notification_schedules.notificate_at, \'YYYY-MM-DD HH24:MI\') = ? 
+                to_char(todo_notification_schedules.notificate_at, \'YYYY-MM-DD HH24:MI\') = ?  
             AND
                 line_user_relation.is_notification = true
         ', [
-            $this->now->format('Y-m-d H:i'),
+            $this->now->format('Y-m-d H:i'), // 分単位で通知を設定できる仕様のため、秒数は省いて比較する
         ]);
 
         return array_map(function ($row) {

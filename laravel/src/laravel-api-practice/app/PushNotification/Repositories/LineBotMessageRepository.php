@@ -15,6 +15,7 @@ class LineBotMessageRepository
     ) {}
 
     /**
+     * @see https://developers.line.biz/ja/reference/messaging-api/#send-push-message
      * @throws RuntimeException
      */
     public function pushNotification(
@@ -26,14 +27,12 @@ class LineBotMessageRepository
             'messages' => $message_dto->messages,
         ];
 
-        // Laravel の HTTP クライアントで POST 実行
         $response = Http::withHeaders([
             'Authorization'    => "Bearer {$this->channel_access_token}",
             'Content-Type'     => 'application/json',
         ])->post(self::API_BASE_URL . '/push', $payload);
 
         if ($response->status() !== 200) {
-            // エラーハンドリング
             throw new RuntimeException('LINE Bot API request failed: ' . $response->body() . 'status_code: ' . $response->status() . 'payload: ' . json_encode($payload, JSON_UNESCAPED_UNICODE));
         }
     }
