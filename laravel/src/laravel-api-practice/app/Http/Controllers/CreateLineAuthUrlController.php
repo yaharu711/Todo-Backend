@@ -36,7 +36,6 @@ class CreateLineAuthUrlController extends Controller
             'redirect_uri'          => $redirect,
             'scope'                 => $scope,
             'state'                 => $state,
-            'prompt' => 'consent',
             'bot_prompt'           => $bot_prompt,
         ]);
 
