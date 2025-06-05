@@ -21,7 +21,7 @@ class CreateLineAuthUrlController extends Controller
         $scope = Config::get('services.line_login.scope');
         $auth_base_url  = Config::get('services.line_login.auth_endpoint');
         // LINEログインの認証画面で許可ボタンを押した後に、LINE公式アカウントの追加を促されるため、追加してもらいやすくなる
-        $bot_prompt = "&bot_prompt=aggressive";
+        $bot_prompt = "aggressive";
         $state = Str::uuid()->toString();
         
         // stateはCSRF対策のために使用する、callback APIでアクセストークンを取得する前に検証する時に使う
