@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace App\Repositories;
 
+use App\Dto\LineUserProfileDto;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -20,7 +21,12 @@ class LineUserProfileRepository
         ->throw()
         ->json();
 
-        return $profile['userId'];
+        return new LineUserProfileDto(
+            line_user_id: $profile['userId'],
+            user_name: $profile['displayName'],
+            picture_url: $profile['pictureUrl'] ?? null,
+            status_message: $profile['statusMessage'] ?? null
+        );
     }
 
     public function updateFollowStatus(string $line_user_id, bool $friend_flag): void
