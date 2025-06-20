@@ -16,11 +16,16 @@ class CallbackLineAuthController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
-    {
+    public function __invoke(
+        Request $request,
+        LineLoginAccessTokenRepository $line_login_access_token_repository,
+        LineUserProfileRepository $line_user_profile_repository,
+        LineUserRelationRepository $line_user_relation_repository,
+        UserRepository $user_repository,
+        DateTimeImmutable $now
+    ) {
         $code = $request->get('code');
         $state = $request->get('state');
-        $now = new DateTimeImmutable();
         
         if (!$code || !$state) {
             // codeまたはstateが存在しない場合は、403エラーを返す
@@ -31,11 +36,6 @@ class CallbackLineAuthController extends Controller
             // セッションにline_loginが存在しない場合は、403エラーを返す
             return response()->json(['error' => 'csrf attack'], 403);
         }
-
-        $line_login_access_token_repository = new LineLoginAccessTokenRepository();
-        $line_user_profile_repository = new LineUserProfileRepository($now);
-        $line_user_relation_repository = new LineUserRelationRepository($now);
-        $user_repository = new UserRepository();
 
         // TODO: 毎回アクセストークンを発行しているが、アクセストークンの有効期限が切れた場合にのみ発行するようにする。
         $access_token = $line_login_access_token_repository->issueAccessToken($code);

@@ -16,11 +16,13 @@ class UpdateTodoController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(UpdateTodoRequest $request, int $todo_id): JsonResponse
-    {
-        $now = new DateTimeImmutable();
-        $todo_repo = new TodoRepository($now);
-        $imcompleted_todo_order_repo = new ImcompletedTodoOrderRepository();
+    public function __invoke(
+        UpdateTodoRequest $request,
+        DateTimeImmutable $now,
+        int $todo_id,
+        TodoRepository $todo_repository,
+        ImcompletedTodoOrderRepository $imcompleted_todo_order_repository
+    ): JsonResponse {
         $user_id = Auth::id();
         $input_name = $request->input('name');
         $input_memo = $request->input('memo');
@@ -29,7 +31,7 @@ class UpdateTodoController extends Controller
 
         DB::beginTransaction();
         try {
-            $todo = $todo_repo->getTodo($user_id, $todo_id);
+            $todo = $todo_repository->getTodo($user_id, $todo_id);
             if (is_null($todo)) return response()->json(['message' => '指定されたtodoは存在しません'], 404);
 
             $should_update_name = !is_null($input_name) && $input_name !== $todo->name;
@@ -48,14 +50,14 @@ class UpdateTodoController extends Controller
                 $todo->is_completed = $input_is_completed;
                 if ($input_is_completed) {
                     $todo->completed_at = $now;
-                    $imcompleted_todo_order_repo->delete($user_id, $todo_id);
+                    $imcompleted_todo_order_repository->delete($user_id, $todo_id);
                 } else {
                     $todo->imcompleted_at = $now;
-                    $imcompleted_todo_order_repo->insertAsFirst($user_id, $todo_id);
+                    $imcompleted_todo_order_repository->insertAsFirst($user_id, $todo_id);
                 }
             }
 
-            $todo_repo->updateTodo($todo);
+            $todo_repository->updateTodo($todo);
             DB::commit();
         } catch (Exception $exception) {
             DB::rollBack();

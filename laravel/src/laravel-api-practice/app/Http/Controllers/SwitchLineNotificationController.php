@@ -13,14 +13,16 @@ class SwitchLineNotificationController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(SwitchLineNotificationRequest $request): JsonResponse
-    {
-        $now = new DateTimeImmutable();
+    public function __invoke(
+        SwitchLineNotificationRequest $request,
+        DateTimeImmutable $now,
+        LineUserRelationRepository $line_user_relation_repository
+    ): JsonResponse {
         $is_notification = $request->input('is_notification');
         $userId = Auth::id();
-        $repository = new LineUserRelationRepository($now);
+        $line_user_relation_repository = new LineUserRelationRepository($now);
 
-        $repository->updateNotificationStatus($userId, $is_notification, $now);
+        $line_user_relation_repository->updateNotificationStatus($userId, $is_notification, $now);
         return response()->json(['message' => 'success'], 200);
     }
 }

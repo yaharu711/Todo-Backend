@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Repositories\LineUserRelationRepository;
 use App\Services\LineBotService;
-use DateTimeImmutable;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,8 +15,10 @@ class HandleLineWebhookController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request): JsonResponse
-    {
+    public function __invoke(
+        Request $request,
+        LineBotService $line_bot_service
+    ): JsonResponse {
         $raw_body   = $request->getContent();
         /**
          * x-line-signatureは大文字小文字を区別せずに検証して欲しいとのこと。
@@ -54,18 +55,17 @@ class HandleLineWebhookController extends Controller
             if ($user_id === null) {
                 continue;   // 念のため null ガード
             }
-            $this->routeWebhookEvent($type, $user_id);
+            $this->routeWebhookEvent($line_bot_service, $type, $user_id);
         }
 
         return response()->json(['message' => 'ok'], 200);
     }
 
-    private function routeWebhookEvent(string $type, string $line_user_id): void
-    {
-        $now = new DateTimeImmutable();
-        $line_user_profile_repository = new LineUserRelationRepository($now);
-        $line_bot_service = new LineBotService($line_user_profile_repository, $now);
-
+    private function routeWebhookEvent(
+        LineBotService $line_bot_service,
+        string $type,
+        string $line_user_id
+    ): void {
         if ($type === 'follow' || $type === 'unfollow') {
             try {
                 $line_bot_service->updateFollowStatus($line_user_id, $type === 'follow');
