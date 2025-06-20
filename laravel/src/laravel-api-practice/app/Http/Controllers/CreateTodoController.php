@@ -14,9 +14,10 @@ class CreateTodoController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(CreateTodoRequest $request): JsonResponse
-    {
-        $now = new DateTimeImmutable();
+    public function __invoke(
+        CreateTodoRequest $request,
+        DateTimeImmutable $now
+    ): JsonResponse {
         $user_id = Auth::user()->id;
         $todoName = $request->input('name');
         try {

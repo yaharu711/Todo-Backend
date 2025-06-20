@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use DateTimeImmutable;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -14,10 +13,9 @@ class InvalidateLatestFcmTokenController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(DateTimeImmutable $now): JsonResponse
     {
         $user_id = Auth::id();
-        $now = new DateTimeImmutable();
 
         DB::beginTransaction();
         try {

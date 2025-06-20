@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\LineUserRelationRepository;
-use DateTimeImmutable;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GetLineNotificationStatusController extends Controller
@@ -13,13 +11,12 @@ class GetLineNotificationStatusController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request): JsonResponse
-    {
-        $now = new DateTimeImmutable();
+    public function __invoke(
+        LineUserRelationRepository $line_user_relation_repository
+    ): JsonResponse {
         $userId = Auth::id();
-        $repository = new LineUserRelationRepository($now);
 
-        $line_user_relation = $repository->getLineUserRelation($userId);
+        $line_user_relation = $line_user_relation_repository->getLineUserRelation($userId);
         if ($line_user_relation === null) {
             return response()->json([
                 'message' => 'not found user line relation',

@@ -13,11 +13,12 @@ class SaveFcmTokenController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(SaveFcmTokenRequest $request): JsonResponse
-    {
+    public function __invoke(
+        SaveFcmTokenRequest $request,
+        DateTimeImmutable $now
+    ): JsonResponse {
         $fcm_token = $request->input('fcm_token');
         $user_id = Auth::id();
-        $now = new DateTimeImmutable();
 
         DB::statement('
             INSERT INTO fcm (user_id, token, created_at)
