@@ -42,6 +42,7 @@ class HttpExceptionHandler
     private function render(): void
     {
         $this->exceptions->render(function (Throwable $e) {
+            dd($e->getMessage());
             // 認証エラーなど、特定の例外は独自のハンドリングをスキップ
             if ($e instanceof AuthenticationException) {
                 return;  // デフォルトのハンドリングに任せる

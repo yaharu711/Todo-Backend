@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Model\UserModel;
 use App\Repositories\LineLoginAccessTokenRepository;
 use App\Repositories\LineUserProfileRepository;
-use App\Repositories\UserLineRelationRepository;
+use App\Repositories\LineUserRelationRepository;
+use App\Repositories\UserRepository;
 use DateTimeImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,30 +34,42 @@ class CallbackLineAuthController extends Controller
 
         $line_login_access_token_repository = new LineLoginAccessTokenRepository();
         $line_user_profile_repository = new LineUserProfileRepository($now);
-        $user_line_relation_repository = new UserLineRelationRepository();
+        $line_user_relation_repository = new LineUserRelationRepository($now);
+        $user_repository = new UserRepository();
 
+        // TODO: 毎回アクセストークンを発行しているが、アクセストークンの有効期限が切れた場合にのみ発行するようにする。
         $access_token = $line_login_access_token_repository->issueAccessToken($code);
-        $line_user_id = $line_user_profile_repository->getLineUserIdByLoginApi($access_token);
+        $line_user_profile = $line_user_profile_repository->getLineUserIdByLoginApi($access_token);
         $user_id = Auth::id();
-        if ($user_id !== null) { // 設定画面からのLINE連携の場合
+        // ログイン済みであり、設定画面からのLINE連携の場合
+        if ($user_id !== null) {
             // TODO: 同じLINEアカウントで別のユーザーとしてログインする場合はエラーになる。
             // その時は、Slackに通知してユーザーには500ページを表示するようにする。
-            $user_line_relation_repository->upsert($user_id, $line_user_id, $now);
-            // (デフォルトで302リダイレクト)。設定画面に戻るようにする。
-            return redirect()->away(config('app.frontend_url').'/setting');
+            $line_user_relation_repository->upsert($user_id, $line_user_profile->line_user_id, $now);
+            // (デフォルトで302リダイレクト)。
+            return redirect()->away(config('app.frontend_setting_page'));
         }
 
-        // 本番環境にLINE周りとfrontend_app_urlの環境変数を設定する。
-        // - 新規登録
-            // usersテーブルに新規レコードを作成する
-        // - 新規登録済み、連携済みのログイン
-            // 何もしないで、Auth::login()を使用して、ユーザーをログインさせる
-        // Auth::id()がnullの場合はusersテーブルに新規レコードを作成する
-            // すでにレコードが存在する場合は、何もしない
-            // これは設定画面からLINEログインを行うユーザもいるため（既存ユーザー用）
-        // 取得したユーザーのプロフィール情報を元に、user_line_relationテーブルにレコードを作成する
+        $line_user_relation = $line_user_relation_repository->getLineUserRelationByLineUserId($line_user_profile->line_user_id);
+        // ログインしていないかつ、連携やLINEログインしたことないユーザーもいるが、
+        // 注意書きとして既存アカウントとのLINE連携は設定画面からするようお願いする
+        if (is_null($line_user_relation)) { // 新規登録
+            $user = new UserModel(
+                0,
+                $line_user_profile->user_name,
+                '', // メールアドレスは不要
+                '' // パスワードはLINEログインなので不要
+            );
+            $user_id = $user_repository->createAndReturnId($user);
+            // 作成したユーザーとLineユーザーを連携させる
+            $line_user_relation_repository->upsert($user_id, $line_user_profile->line_user_id, $now);
 
-        // Auth::id()がnullの場合、Auth::login()を使用して、ユーザーをログインさせる
+            Auth::loginUsingId($user_id);
+            return redirect()->away(config('app.frontend_home_page'));
+        } else { // 新規登録済み、連携済みのログイン
+            Auth::loginUsingId($line_user_relation->user_id);
+            return redirect()->away(config('app.frontend_home_page'));
+        }
     }
 
     private function isValidState(Request $request, DateTimeImmutable $now, string $state): bool

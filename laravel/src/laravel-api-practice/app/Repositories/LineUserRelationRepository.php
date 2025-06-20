@@ -39,6 +39,41 @@ class LineUserRelationRepository
         );
     }
 
+    public function getLineUserRelationByLineUserId(string $line_user_id): LineUserRelationModel|null
+    {
+        $result = DB::select('
+            SELECT 
+                user_id,
+                line_user_id,
+                friend_flag,
+                created_at,
+                updated_at,
+                is_notification
+            FROM line_user_relation 
+            WHERE line_user_id = ?',
+            [$line_user_id]
+        );
+
+        if (empty($result)) {
+            return null;
+        }
+        return new LineUserRelationModel(
+            user_id: $result[0]->user_id,
+            line_user_id: $result[0]->line_user_id,
+            friend_flag: $result[0]->friend_flag,
+            created_at: new DateTimeImmutable($result[0]->created_at),
+            updated_at: new DateTimeImmutable($result[0]->updated_at),
+            is_notification: $result[0]->is_notification
+        );
+    }
+
+    public function upsert(int $user_id, string $line_user_id): void
+    {
+        DB::statement('INSERT INTO line_user_relation (user_id, line_user_id, created_at, updated_at)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT (user_id) DO NOTHING', [$user_id, $line_user_id, $this->now, $this->now]);
+    }
+
     public function updateFollowStatus(string $line_user_id, bool $follow_flg): void
     {
         DB::statement('

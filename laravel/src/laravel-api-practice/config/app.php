@@ -124,4 +124,7 @@ return [
     ],
 
     'frontend_url' => env('FRONTEND_APP_URL', 'http://localhost:3000'),
+
+    'frontend_setting_page' => env('FRONTEND_APP_URL', 'http://localhost:3000') . '/settings',
+    'frontend_home_page' => env('FRONTEND_APP_URL', 'http://localhost:3000') . '/todos',
 ];
