@@ -53,7 +53,7 @@ class UpdateTodoController extends Controller
                     $imcompleted_todo_order_repository->delete($user_id, $todo_id);
                 } else {
                     $todo->imcompleted_at = $now;
-                    $imcompleted_todo_order_repository->insertAsFirst($user_id, $todo_id);
+                    $imcompleted_todo_order_repository->upsertAsFirst($user_id, $todo_id);
                 }
             }
 
