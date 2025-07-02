@@ -14,7 +14,7 @@ class UpdateTodoRequest extends FormRequest
         return [
             'name' => ['string', 'min:1', 'max:100'],
             'memo' => ['string', 'max:3000'],
-            'is_completed' => ['boolean'],
+            // 'is_completed' => ['boolean'],
         ];
     }
 
