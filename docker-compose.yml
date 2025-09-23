@@ -6,13 +6,6 @@ services:
     build:
       context: ./laravel/local
     environment:
-      - APP_ENV='local'
-      - DB_CONNECTION=${DB_CONNECTION}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_DATABASE=${POSTGRES_DB}
-      - DB_USERNAME=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
       # 以下の環境変数により、コンテナとドメインを紐づけているらしい
       - VIRTUAL_HOST=api.dev.practice-react-laravel.site
       # Laravelサーバの起動で--portオプションあるが、command: php artisan server --port=8000にすると、ファイルを修正するとエラーになるから80のままで行く
