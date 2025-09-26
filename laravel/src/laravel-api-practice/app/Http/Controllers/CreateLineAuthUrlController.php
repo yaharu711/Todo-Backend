@@ -23,12 +23,22 @@ class CreateLineAuthUrlController extends Controller
         // LINEログインの認証画面で許可ボタンを押した後に、LINE公式アカウントの追加を促されるため、追加してもらいやすくなる
         $bot_prompt = "aggressive";
         $state = Str::uuid()->toString();
+        // フロントから指定された遷移先（例: /todos#todo_id=6）。安全のためルート相対パスのみ許可
+        $returnTo = $request->query('return_to');
+        $isValidReturnTo = is_string($returnTo)
+            && Str::startsWith($returnTo, '/')
+            && !Str::startsWith($returnTo, '//');
         
         // stateはCSRF対策のために使用する、callback APIでアクセストークンを取得する前に検証する時に使う
-        $request->session()->put('line_login', [
+        $sessionPayload = [
             'state'         => $state,
             'expires_at'    => CarbonImmutable::now()->addMinutes(10),
-        ]);
+        ];
+        if ($isValidReturnTo) {
+            // 相対パスのまま保存し、コールバックでフロントエンドのオリジンと結合してリダイレクトする
+            $sessionPayload['return_to'] = $returnTo;
+        }
+        $request->session()->put('line_login', $sessionPayload);
 
         $params = http_build_query([
             'response_type'         => 'code',

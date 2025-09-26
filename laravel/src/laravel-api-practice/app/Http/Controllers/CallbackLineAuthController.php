@@ -26,6 +26,8 @@ class CallbackLineAuthController extends Controller
     ) {
         $code = $request->get('code');
         $state = $request->get('state');
+        // isValidState()でpullによりセッションから消えるため、先に取り出しておく
+        $returnToRelative = $request->session()->get('line_login.return_to');
         
         if (!$code || !$state) {
             // codeまたはstateが存在しない場合は、403エラーを返す
@@ -47,6 +49,10 @@ class CallbackLineAuthController extends Controller
             // その時は、Slackに通知してユーザーには500ページを表示するようにする。
             $line_user_relation_repository->upsert($user_id, $line_user_profile->line_user_id, $now);
             // (デフォルトで302リダイレクト)。
+            if (is_string($returnToRelative) && str_starts_with($returnToRelative, '/')) {
+                $url = rtrim(config('app.frontend_url'), '/') . $returnToRelative;
+                return redirect()->away($url);
+            }
             return redirect()->away(config('app.frontend_setting_page'));
         }
 
@@ -65,9 +71,17 @@ class CallbackLineAuthController extends Controller
             $line_user_relation_repository->upsert($user_id, $line_user_profile->line_user_id, $now);
 
             Auth::loginUsingId($user_id);
+            if (is_string($returnToRelative) && str_starts_with($returnToRelative, '/')) {
+                $url = rtrim(config('app.frontend_url'), '/') . $returnToRelative;
+                return redirect()->away($url);
+            }
             return redirect()->away(config('app.frontend_home_page'));
         } else { // 新規登録済み、連携済みのログイン
             Auth::loginUsingId($line_user_relation->user_id);
+            if (is_string($returnToRelative) && str_starts_with($returnToRelative, '/')) {
+                $url = rtrim(config('app.frontend_url'), '/') . $returnToRelative;
+                return redirect()->away($url);
+            }
             return redirect()->away(config('app.frontend_home_page'));
         }
     }
