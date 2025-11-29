@@ -28,16 +28,74 @@ class TodoRepository
         ]);
         if (count($todo_arr) === 0) return null;
 
+        return $this->mapRowToTodoModel($todo_arr[0]);
+    }
+
+    /**
+     * 未完了のTodoを並び順付きで取得し、filter条件に応じて絞り込む
+     *
+     * @return TodoModel[]
+     */
+    public function getImcompletedTodosWithOrderAndFilter(int $user_id, string $filter): array
+    {
+        $base_sql = '
+            SELECT 
+                todos.*, todo_notification_schedules.notificate_at
+            FROM 
+                todos
+            INNER JOIN 
+                imcompleted_todo_orders
+            ON todos.user_id = imcompleted_todo_orders.user_id
+            JOIN LATERAL 
+                unnest(imcompleted_todo_orders.imcompleted_todo_order) WITH ORDINALITY as ord(todo_id, ord)
+            ON todos.id = ord.todo_id
+            LEFT OUTER JOIN 
+                todo_notification_schedules
+            ON todos.id = todo_notification_schedules.todo_id
+            WHERE 
+                todos.user_id = ?  
+                AND todos.is_completed = false
+        ';
+
+        $bindings = [$user_id];
+
+        switch ($filter) {
+            case 'today':
+                $base_sql .= ' AND todo_notification_schedules.notificate_at::date = ?';
+                $bindings[] = $this->now->format('Y-m-d');
+                break;
+            case 'overdue':
+                $base_sql .= ' AND EXISTS (
+                    SELECT 1 FROM success_todo_notification_schedules sts
+                    WHERE sts.todo_id = todos.id
+                    AND sts.notificate_at <= ?
+                )';
+                $bindings[] = $this->now->format('Y-m-d H:i:s');
+                break;
+            case 'all':
+            default:
+                break;
+        }
+
+        $base_sql .= ' ORDER BY ord.ord;';
+
+        $rows = DB::select($base_sql, $bindings);
+
+        return array_map(fn($row) => $this->mapRowToTodoModel($row), $rows);
+    }
+
+    private function mapRowToTodoModel(object $row): TodoModel
+    {
         return new TodoModel(
-            $todo_arr[0]->id,
-            $todo_arr[0]->user_id,
-            $todo_arr[0]->name,
-            $todo_arr[0]->memo,
-            is_null($todo_arr[0]->notificate_at) ? null : new DateTimeImmutable($todo_arr[0]->notificate_at),
-            new DateTimeImmutable($todo_arr[0]->created_at),
-            new DateTimeImmutable($todo_arr[0]->imcompleted_at),
-            $todo_arr[0]->is_completed,
-            is_null($todo_arr[0]->completed_at) ? null : new DateTimeImmutable($todo_arr[0]->completed_at),
+            $row->id,
+            $row->user_id,
+            $row->name,
+            $row->memo,
+            is_null($row->notificate_at) ? null : new DateTimeImmutable($row->notificate_at),
+            new DateTimeImmutable($row->created_at),
+            new DateTimeImmutable($row->imcompleted_at),
+            $row->is_completed,
+            is_null($row->completed_at) ? null : new DateTimeImmutable($row->completed_at),
         );
     }
 
