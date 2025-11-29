@@ -14,7 +14,6 @@ class PushNotificationByFcmService
         readonly private DateTimeImmutable $now,
         // このServiceをテストするためには、KreaitFirebaseClientのモックを作成する必要があり、インターフェースが必要
         // sendAll()から返ってくるFcmSendAllReportのモックも作成する必要がある（成功と失敗のオブジェクトは固定値に設定しないといけない）
-        // まあ、まだまだテストがしにくいクラスだね、責務の分離がうまくできていないかな
         readonly private KreaitFirebaseClient $messaging,
         readonly private FcmNotificationQueryService $fcm_notification_query_service
     ){}
@@ -29,8 +28,8 @@ class PushNotificationByFcmService
 
             $result = $this->messaging->sendAll($notification_request_list);
 
-            $success_notification_dto_list = $result->toSuccessNotificationDtoList($notification_request_list, $this->now);
-            $error_notification_dto_list = $result->toErrorNotificationDtoList($notification_request_list, $this->now);
+            $success_notification_dto_list = $result->toSuccessNotificationDtoList($notification_request_list);
+            $error_notification_dto_list   = $result->toErrorNotificationDtoList($notification_request_list);
 
             return new FcmPushNotificationResultDto(
                 $success_notification_dto_list,
