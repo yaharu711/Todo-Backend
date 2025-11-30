@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TodoModel;
+use App\Http\Response\ResponseHelper;
 use App\Repositories\TodoRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use DateTimeImmutable;
-use DateTimeInterface;
-use DateTimeZone;
 
 class GetTodosController extends Controller
 {
@@ -25,46 +23,38 @@ class GetTodosController extends Controller
         $filter = $request->query('filter', 'all');
 
         if ($is_completed_only) {
-            $todos = DB::select('SELECT * FROM todos WHERE user_id = ? AND is_completed = true ORDER BY completed_at DESC', [$user_id]);
             return response()->json([
-                'todos' => $this->formatTodos($todos),
+                'todos' => $this->formatTodos(
+                    $this->todo_repository->getCompletedTodos($user_id)
+                ),
             ]);
         }
 
-        $todos = $this->todo_repository->getImcompletedTodosWithOrderAndFilter($user_id, $filter);
-
         return response()->json([
-            'todos' => $this->formatTodos($todos),
+            'todos' => $this->formatTodos(
+                $this->todo_repository->getImcompletedTodosWithOrderAndFilter($user_id, $filter)
+            ),
         ]);
     }
 
     /**
      * レスポンス用に日時をISO 8601（ローカルタイムゾーン）でフォーマットする
+     *
+     * @param TodoModel[] $todos
      */
     private function formatTodos(array $todos): array
     {
-        $tz = new DateTimeZone(config('app.timezone'));
-
-        $formatDate = function ($value) use ($tz) {
-            if (is_null($value)) return null;
-            if ($value instanceof DateTimeImmutable) {
-                return $value->setTimezone($tz)->format(DateTimeInterface::ATOM);
-            }
-            // DB::select の結果は文字列なのでパース
-            return (new DateTimeImmutable($value))->setTimezone($tz)->format(DateTimeInterface::ATOM);
-        };
-
-        return array_map(function ($todo) use ($formatDate) {
+        return array_map(function ($todo) {
             return [
                 'id'             => $todo->id,
                 'user_id'        => $todo->user_id,
                 'name'           => $todo->name,
                 'memo'           => $todo->memo ?? '',
-                'notificate_at'  => $formatDate($todo->notificate_at ?? null),
-                'created_at'     => $formatDate($todo->created_at ?? null),
-                'imcompleted_at' => $formatDate($todo->imcompleted_at ?? null),
+                'notificate_at'  => is_null($todo->notificate_at) ? null : ResponseHelper::formatDateTime($todo->notificate_at),
+                'created_at'     => ResponseHelper::formatDateTime($todo->created_at),
+                'imcompleted_at' => ResponseHelper::formatDateTime($todo->imcompleted_at),
                 'is_completed'   => (bool) $todo->is_completed,
-                'completed_at'   => $formatDate($todo->completed_at ?? null),
+                'completed_at'   => is_null($todo->completed_at) ? null : ResponseHelper::formatDateTime($todo->completed_at),
             ];
         }, $todos);
     }
