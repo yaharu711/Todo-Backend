@@ -26,7 +26,7 @@ class UpdateTodoController extends Controller
         $user_id = Auth::id();
         $input_name = $request->input('name');
         $input_memo = $request->input('memo');
-        $input_notificate_at = $this->calculateNotificateAt($now, $request->input('notificate_at'));
+        $input_notificate_at = $this->calculateNotificateAt($request->input('notificate_at'));
         $input_is_completed = $request->input('is_completed');
 
         DB::beginTransaction();
@@ -44,6 +44,7 @@ class UpdateTodoController extends Controller
             // メモについて
             if ($should_update_memo) $todo->memo = $input_memo;
             // 通知の日時について
+            // 過去時刻が送られてきても元々登録されている時刻であれば保持したいのと、新しく過去の時刻が送られてきて登録されても特に問題がないため、処理が複雑にならないようにそのまま処理している
             if ($should_update_notificate_at) $todo->notificate_at = is_null($input_notificate_at) ? null : new DateTimeImmutable($input_notificate_at);
             // 完了・未完了について
             if ($should_update_is_completed) {
@@ -66,13 +67,10 @@ class UpdateTodoController extends Controller
         return response()->json(['message' => 'success']);
     }
 
-    private function calculateNotificateAt(DateTimeImmutable $now, ?string $input_notificate_at): ?string
+    private function calculateNotificateAt(?string $input_notificate_at): ?string
     {
-        $now_minute_formatted = $now->format('Y-m-d H:i');
-        $input_notificate_at_minute_formatted = (new DateTimeImmutable($input_notificate_at))->format('Y-m-d H:i');
-        $is_input_notificate_at_before_now = !is_null($input_notificate_at) && $now_minute_formatted >= $input_notificate_at_minute_formatted;
-        // 通知を設定して、通知の時間が来るまで（来たあとも）リロードしていないユーザがいる
-        // その時memoの更新などを行った時、再度notificate_atが登録されてしまうことを防いでいる
-        return $is_input_notificate_at_before_now ? null : $input_notificate_at;
+        if (is_null($input_notificate_at)) return null;
+
+        return (new DateTimeImmutable($input_notificate_at))->format('Y-m-d H:i');
     }
 }
