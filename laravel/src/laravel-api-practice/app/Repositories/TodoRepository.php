@@ -84,6 +84,34 @@ class TodoRepository
         return array_map(fn($row) => $this->mapRowToTodoModel($row), $rows);
     }
 
+    /**
+     * 完了済みTodoを完了日時の降順で取得
+     *
+     * @return TodoModel[]
+     */
+    public function getCompletedTodos(int $user_id): array
+    {
+        $rows = DB::select('
+            SELECT 
+                todos.*, todo_notification_schedules.notificate_at
+            FROM 
+                todos
+            LEFT OUTER JOIN 
+                todo_notification_schedules
+            ON 
+                todos.id = todo_notification_schedules.todo_id
+            WHERE 
+                todos.user_id = ?  
+                AND todos.is_completed = true
+            ORDER BY 
+                todos.completed_at DESC
+        ', [
+            $user_id,
+        ]);
+
+        return array_map(fn($row) => $this->mapRowToTodoModel($row), $rows);
+    }
+
     private function mapRowToTodoModel(object $row): TodoModel
     {
         return new TodoModel(
