@@ -36,7 +36,8 @@ class UpdateTodoController extends Controller
 
             $should_update_name = !is_null($input_name) && $input_name !== $todo->name;
             $should_update_memo = !is_null($input_memo) && $input_memo !== $todo->memo;
-            $should_update_notificate_at = $input_notificate_at !== $todo->notificate_at;
+            // DateTimeImmutable同士で比較（タイムゾーン差分も考慮したいので==を使用し、等価でない場合のみ更新）
+            $should_update_notificate_at = !($input_notificate_at == $todo->notificate_at);
             $should_update_is_completed = !is_null($input_is_completed) && $input_is_completed !== $todo->is_completed;
 
             // TODO名について
@@ -45,7 +46,7 @@ class UpdateTodoController extends Controller
             if ($should_update_memo) $todo->memo = $input_memo;
             // 通知の日時について
             // 過去時刻が送られてきても元々登録されている時刻であれば保持したいのと、新しく過去の時刻が送られてきて登録されても特に問題がないため、処理が複雑にならないようにそのまま処理している
-            if ($should_update_notificate_at) $todo->notificate_at = is_null($input_notificate_at) ? null : new DateTimeImmutable($input_notificate_at);
+            if ($should_update_notificate_at) $todo->notificate_at = $input_notificate_at;
             // 完了・未完了について
             if ($should_update_is_completed) {
                 $todo->is_completed = $input_is_completed;
@@ -67,10 +68,10 @@ class UpdateTodoController extends Controller
         return response()->json(['message' => 'success']);
     }
 
-    private function calculateNotificateAt(?string $input_notificate_at): ?string
+    private function calculateNotificateAt(?string $input_notificate_at): ?DateTimeImmutable
     {
         if (is_null($input_notificate_at)) return null;
 
-        return (new DateTimeImmutable($input_notificate_at))->format('Y-m-d H:i');
+        return new DateTimeImmutable($input_notificate_at);
     }
 }
