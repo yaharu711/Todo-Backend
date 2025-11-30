@@ -3,6 +3,7 @@ namespace App\Repositories;
 
 use App\Models\TodoModel;
 use DateTimeImmutable;
+use InvalidArgumentException;
 use Illuminate\Support\Facades\DB;
 
 class TodoRepository
@@ -65,16 +66,15 @@ class TodoRepository
                 $bindings[] = $this->now->format('Y-m-d');
                 break;
             case 'overdue':
-                $base_sql .= ' AND EXISTS (
-                    SELECT 1 FROM success_todo_notification_schedules sts
-                    WHERE sts.todo_id = todos.id
-                    AND sts.notificate_at <= ?
-                )';
+                // 通知予定時刻（分単位）が現在より前のものを期限切れとして抽出
+                $base_sql .= " AND todo_notification_schedules.notificate_at IS NOT NULL"
+                           . " AND date_trunc('minute', todo_notification_schedules.notificate_at) < date_trunc('minute', ?::timestamptz)";
                 $bindings[] = $this->now->format('Y-m-d H:i:s');
                 break;
             case 'all':
-            default:
                 break;
+            default:
+                throw new InvalidArgumentException('Unsupported filter: ' . $filter);
         }
 
         $base_sql .= ' ORDER BY ord.ord;';
